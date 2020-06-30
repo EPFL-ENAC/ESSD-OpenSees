@@ -31,6 +31,122 @@
 #include <Parameter.h>
 #include <math.h>
 
+#include <elementAPI.h>
+#include <UniaxialMaterial.h>
+#include <ElasticMaterial.h>
+#include <FiberSection3d.h>
+
+void* OPS_RCCircularSection()
+{
+  if (OPS_GetNumRemainingInputArgs() < 13) {
+    opserr << "WARNING insufficient arguments\n";
+    opserr << "Want: section RCCircularSection tag? coreTag? coverTag? steelTag? d? cover? As? NringsCore? NringsCover? Nwedges? Nsteel? -GJ GJ <or> -torsion matTag\n";
+    return 0;
+  }
+  
+  int idata[8];
+  double ddata[3];
+  
+  int numdata = 4;
+  if (OPS_GetIntInput(&numdata, idata) < 0) {
+    opserr << "WARNING invalid section RCCircularSection input\n";
+    return 0;
+  }
+  
+  numdata = 3;
+  if (OPS_GetDoubleInput(&numdata, ddata) < 0) {
+    opserr << "WARNING invalid section RCCircularSection input\n";
+    return 0;
+  }
+  
+  numdata = 4;
+  if (OPS_GetIntInput(&numdata, &idata[4]) < 0) {
+    opserr << "WARNING invalid section RCCircularSection input\n";
+    return 0;
+  }
+  
+  int tag=idata[0], coreTag=idata[1], coverTag=idata[2], steelTag=idata[3];
+  double d=ddata[0], cover=ddata[1], As=ddata[2];
+  int ncore=idata[4], ncover=idata[5], nwedge=idata[6], nsteel=idata[7];
+  
+  UniaxialMaterial *theCore = OPS_getUniaxialMaterial(coreTag);
+  
+  if (theCore == 0) {
+    opserr << "WARNING uniaxial material does not exist\n";
+    opserr << "material: " << coreTag; 
+    opserr << "\nRCCircularSection section: " << tag << endln;
+    return 0;
+  }
+  
+  UniaxialMaterial *theCover = OPS_getUniaxialMaterial(coverTag);
+  
+  if (theCover == 0) {
+    opserr << "WARNING uniaxial material does not exist\4n";
+    opserr << "material: " << coverTag; 
+    opserr << "\nRCCircularSection section: " << tag << endln;
+    return 0;
+  }
+  
+  UniaxialMaterial *theSteel = OPS_getUniaxialMaterial(steelTag);
+  
+  if (theSteel == 0) {
+    opserr << "WARNING uniaxial material does not exist\n";
+    opserr << "material: " << steelTag; 
+    opserr << "\nRCCircularSection section: " << tag << endln;
+    return 0;
+  }
+  
+  RCCircularSectionIntegration rcsect(d, As, cover, ncore, ncover, nwedge, nsteel);
+  
+  int numFibers = rcsect.getNumFibers();
+  
+  UniaxialMaterial **theMats = new UniaxialMaterial *[numFibers];
+  
+  rcsect.arrangeFibers(theMats, theCore, theCover, theSteel);
+  
+  UniaxialMaterial *torsion = 0;
+  if (OPS_GetNumRemainingInputArgs() < 2) {
+    opserr << "WARNING torsion not specified for RCCircularSection\n";
+    opserr << "Use either -GJ $GJ or -torsion $matTag\n";
+    opserr << "\nRCCircularSection: " << tag << endln;
+    return 0;
+  }
+  const char* opt = OPS_GetString();
+  numdata = 1;
+  bool deleteTorsion = false;
+  if (strcmp(opt, "-GJ") == 0) {
+    double GJ;
+    if (OPS_GetDoubleInput(&numdata, &GJ) < 0) {
+      opserr << "WARNING: failed to read GJ\n";
+      return 0;
+    }
+    torsion = new ElasticMaterial(0,GJ);
+    deleteTorsion = true;
+  }
+  if (strcmp(opt, "-torsion") == 0) {
+    int torsionTag;
+    if (OPS_GetIntInput(&numdata, &torsionTag) < 0) {
+      opserr << "WARNING: failed to read torsion\n";
+      return 0;
+    }
+    torsion = OPS_getUniaxialMaterial(torsionTag);
+  }
+  if (torsion == 0) {
+    opserr << "WARNING torsion not specified for RCCircularSection\n";
+    opserr << "\nRCCircularSection section: " << tag << endln;
+    return 0;
+  }
+  
+  // Parsing was successful, allocate the section
+  SectionForceDeformation* theSection = new FiberSection3d(tag, numFibers, theMats, rcsect, *torsion);
+  if (deleteTorsion)
+    delete torsion;
+  
+  delete [] theMats;
+  
+  return theSection;
+}
+
 RCCircularSectionIntegration::RCCircularSectionIntegration(double D,
 					   double AS,
 					   double COVER,
@@ -59,7 +175,7 @@ RCCircularSectionIntegration::RCCircularSectionIntegration(double D,
 }
 
 RCCircularSectionIntegration::RCCircularSectionIntegration():
-  SectionIntegration(SECTION_INTEGRATION_TAG_RC),
+  SectionIntegration(SECTION_INTEGRATION_TAG_RCCIRCULAR),
   d(0.0), As(0.0), cover(0.0),
   NringsCore(1), NringsCover(1), Nwedges(2), Nsteel(1),
   parameterID(0)
@@ -193,7 +309,7 @@ RCCircularSectionIntegration::getFiberWeights(int nFibers, double *wt)
 
   int loc = 0;
 
-  //std::ofstream ofs ("areas.out", std::ofstream::out);
+  //std::ofstream ofs ("areasCircular.out", std::ofstream::out);
 
   // 1. Core region
   double dr = (0.5*d-cover)/NringsCore;
@@ -323,16 +439,25 @@ RCCircularSectionIntegration::getLocationsDeriv(int nFibers, double *dyidh, doub
   int loc = 0;
 
   // 1. Core region
-  double drdh = (0.5*dddh-dcoverdh)/NringsCore;
+  double dr = (0.5*d-cover)/NringsCore;
+  double ddrdh = (0.5*dddh-dcoverdh)/NringsCore;
   double rinner = 0.0;
+  double drinnerdh = 0.0;
   double Ainner = 0.0;
+  double dAinnerdh = 0.0;
   double xinner = 0.0;
+  double dxinnerdh = 0.0;
   for (int i = 0; i < NringsCore; i++) {
-    double router = (i+1)*drdh;
+    double router = (i+1)*dr;
+    double drouterdh = (i+1)*ddrdh;
     double Aouter = router*router*theta;
+    double dAouterdh = 2*router*drouterdh*theta;
     double xouter = 2.0/3.0*router*sin(theta)/theta;
+    double dxouterdh = 2.0/3.0*drouterdh*sin(theta)/theta;
     double area = Aouter-Ainner;
-    double dxbardh = (xouter*Aouter-xinner*Ainner)/area;
+    double dareadh = dAouterdh-dAinnerdh;
+    double xbar = (xouter*Aouter-xinner*Ainner)/area;
+    double dxbardh = (area*(xouter*dAouterdh+dxouterdh*Aouter-xinner*dAinnerdh-dxinnerdh*Ainner)-(xouter*Aouter-xinner*Ainner)*dareadh)/(area*area);
     double angle = theta;
     for (int j = 0; j < Nwedges; j++) {
       dyidh[loc] = dxbardh*cos(angle);
@@ -341,20 +466,30 @@ RCCircularSectionIntegration::getLocationsDeriv(int nFibers, double *dyidh, doub
       loc++;
     }
     Ainner = Aouter;
+    dAinnerdh = dAouterdh;
     xinner = xouter;
+    dxinnerdh = dxouterdh;
   }  
-
+  
   // 2. Cover region
-  drdh = cover/NringsCover;
-  rinner = 0.5*dddh - dcoverdh;
-  // use xinner from above
+  dr = cover/NringsCover;
+  ddrdh = dcoverdh/NringsCover;
+  rinner = 0.5*d - cover;
+  drinnerdh = 0.5*dddh - dcoverdh;
+  // use xinner and dxinnerdh from above
   Ainner = rinner*rinner*theta;
+  dAinnerdh = 2*rinner*drinnerdh*theta;
   for (int i = 0; i < NringsCover; i++) {
-    double router = 0.5*dddh - dcoverdh + (i+1)*drdh;
+    double router = 0.5*d - cover + (i+1)*dr;
+    double drouterdh = 0.5*dddh - dcoverdh + (i+1)*ddrdh;
     double Aouter = router*router*theta;
+    double dAouterdh = 2*router*drouterdh*theta;
     double xouter = 2.0/3.0*router*sin(theta)/theta;
+    double dxouterdh = 2.0/3.0*drouterdh*sin(theta)/theta;
     double area = Aouter-Ainner;
-    double dxbardh = (xouter*Aouter-xinner*Ainner)/area;
+    double dareadh = dAouterdh-dAinnerdh;
+    double xbar = (xouter*Aouter-xinner*Ainner)/area;
+    double dxbardh = (area*(xouter*dAouterdh+dxouterdh*Aouter-xinner*dAinnerdh-dxinnerdh*Ainner)-(xouter*Aouter-xinner*Ainner)*dareadh)/(area*area);    
     double angle = theta;
     for (int j = 0; j < Nwedges; j++) {
       dyidh[loc] = dxbardh*cos(angle);
@@ -363,7 +498,9 @@ RCCircularSectionIntegration::getLocationsDeriv(int nFibers, double *dyidh, doub
       loc++;
     }
     Ainner = Aouter;
+    dAinnerdh = dAouterdh;
     xinner = xouter;
+    dxinnerdh = dxouterdh;
   }  
 
   // 3. Steel bars
@@ -408,29 +545,43 @@ RCCircularSectionIntegration::getWeightsDeriv(int nFibers, double *dwtsdh)
   int loc = 0;
 
   // 1. Core region
-  double drdh = (0.5*dddh-dcoverdh)/NringsCore;
+  double dr = (0.5*d-cover)/NringsCore;
+  double ddrdh = (0.5*dddh-dcoverdh)/NringsCore;
   double rinner = 0.0;
+  double drinnerdh = 0.0;
   double Ainner = 0.0;
+  double dAinnerdh = 0.0;
   for (int i = 0; i < NringsCore; i++) {
-    double router = (i+1)*drdh;
+    double router = (i+1)*dr;
+    double drouterdh = (i+1)*ddrdh;
     double Aouter = router*router*theta;
+    double dAouterdh = 2*router*drouterdh*theta;
     double area = Aouter-Ainner;
+    double dareadh = dAouterdh-dAinnerdh;
     for (int j = 0; j < Nwedges; j++)
-      dwtsdh[loc++] = area;
+      dwtsdh[loc++] = dareadh;
     Ainner = Aouter;
+    dAinnerdh = dAouterdh;
   }
 
   // 2. Cover region
-  drdh = dcoverdh/NringsCover;
-  rinner = 0.5*dddh - dcoverdh;
+  dr = cover/NringsCover;
+  ddrdh = dcoverdh/NringsCover;
+  rinner = 0.5*d - cover;
+  drinnerdh = 0.5*dddh - dcoverdh;
   Ainner = rinner*rinner*theta;
+  dAinnerdh = 2*rinner*drinnerdh*theta;
   for (int i = 0; i < NringsCover; i++) {
-    double router = 0.5*dddh - dcoverdh + (i+1)*drdh;
+    double router = 0.5*d - cover + (i+1)*dr;
+    double drouterdh = 0.5*dddh - dcoverdh + (i+1)*ddrdh;
     double Aouter = router*router*theta;
+    double dAouterdh = 2*router*drouterdh*theta;
     double area = Aouter-Ainner;
+    double dareadh = dAouterdh-dAinnerdh;
     for (int j = 0; j < Nwedges; j++)
-      dwtsdh[loc++] = area;
+      dwtsdh[loc++] = dareadh;
     Ainner = Aouter;
+    dAinnerdh = dAouterdh;
   }
 
   // 3. Steel bars

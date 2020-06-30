@@ -4,6 +4,7 @@ include ../../../Makefile.def
 
 OBJS       = AlphaOS.o \
     AlphaOS_TP.o \
+    EQPath.o \
     AlphaOSGeneralized.o \
     ExplicitDifference.o \
 	AlphaOSGeneralized_TP.o \
@@ -57,6 +58,7 @@ OBJS       = AlphaOS.o \
 	TRBDF2.o \
     TRBDF3.o \
 	WilsonTheta.o \
+	GimmeMCK.o 
 
 all:         $(OBJS)
 

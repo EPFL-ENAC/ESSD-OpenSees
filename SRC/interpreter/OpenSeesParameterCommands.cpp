@@ -35,6 +35,8 @@
 #include <RVParameter.h>
 #include <NodeResponseParameter.h>
 #include <LoadFactorParameter.h>
+#include <ElementStateParameter.h>
+
 #include <vector>
 
 #ifdef _RELIABILITY
@@ -84,7 +86,7 @@ OPS_Parameter()
 	    return -1;
 	}
 
-	if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+	if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 	    opserr << "WARING: parameter - failed to set parameter tag\n";
 	    return -1;
 	}
@@ -109,7 +111,7 @@ OPS_Parameter()
 	    return -1;
 	}
 
-	if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+	if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 	    opserr << "WARING: parameter - failed to set parameter tag\n";
 	    return -1;
 	}
@@ -149,7 +151,7 @@ OPS_Parameter()
 		    return -1;
 		}
 
-		if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+		if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 		    opserr << "WARING: parameter - failed to set parameter tag\n";
 		    return -1;
 		}
@@ -195,7 +197,7 @@ OPS_Parameter()
 		    return -1;
 		}
 
-		if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+		if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 		    opserr << "WARING: parameter - failed to set parameter tag\n";
 		    return -1;
 		}
@@ -350,7 +352,7 @@ OPS_Parameter()
 	theDomain->addParameter(newParameter);
     }
 
-    if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+    if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 	opserr << "WARING: parameter - failed to set parameter tag\n";
 	return -1;
     }
@@ -490,7 +492,7 @@ OPS_addToParameter()
 
     }
 
-    if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+    if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 	opserr << "WARING: parameter - failed to set parameter tag\n";
 	return -1;
     }
@@ -540,7 +542,7 @@ OPS_updateParameter()
 
     theDomain->updateParameter(paramTag, newValue);
 
-    if (OPS_SetIntOutput(&num, &paramTag) < 0) {
+    if (OPS_SetIntOutput(&num, &paramTag, true) < 0) {
 	opserr << "WARING: parameter - failed to set parameter tag\n";
 	return -1;
     }
@@ -562,12 +564,14 @@ int OPS_getParamTags()
 	tags.push_back(theParam->getTag());
     }
 
-    if (tags.empty()) return 0;
+    int size = 0;
+    int* data = 0;
+    if (!tags.empty()) {
+        size = (int) tags.size();
+        data = &tags[0];
+    }
 
-    int size = (int)tags.size();
-    int* data = &tags[0];
-
-    if (OPS_SetIntOutput(&size, data) < 0) {
+    if (OPS_SetIntOutput(&size, data, false) < 0) {
 	opserr << "WARNING failed to set outputs\n";
 	return -1;
     }
@@ -602,10 +606,111 @@ int OPS_getParamValue()
 
     double value = theParam->getValue();
 
-    if (OPS_SetDoubleOutput(&numdata, &value) < 0) {
+    if (OPS_SetDoubleOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
+
+    return 0;
+}
+
+int OPS_setParameter()
+{
+    double newValue = 0.0;
+    ID eleIDs(0, 32);
+    int numEle = 0;
+    int flag = 0;
+
+    const char* opt = OPS_GetString();
+
+    int numdata = 1;
+    if (strcmp(opt,"-val") == 0) {
+	if (OPS_GetDoubleInput(&numdata, &newValue) < 0) {
+	    opserr << "WARNING: failed to get paramber value\n";
+	    return -1;
+	}
+    } else {
+	opserr << "WARNING setParameter:  -val not found \n";
+	return -1;
+    }
+
+    if (OPS_GetNumRemainingInputArgs() == 0) return 0;
+
+    opt = OPS_GetString();
+
+    if ((strcmp(opt,"-ele") == 0) ||
+	(strcmp(opt,"-eles") == 0) ||
+	(strcmp(opt,"-element") == 0)) {
+
+	    //
+	    // read in a list of ele until end of command or other flag
+	    //
+
+	    int eleTag;
+	    while (OPS_GetNumRemainingInputArgs() > 0) {
+		if (OPS_GetIntInput(&numdata, &eleTag) < 0) {
+		    // back on arg
+		    OPS_ResetCurrentInputArg(-1);
+		    break;
+		} else {
+		    eleIDs[numEle] = eleTag;
+		    numEle++;
+		}
+	    }
+
+	    if (numEle > 0)
+		flag = 1;
+
+    } else if (strcmp(opt,"-eleRange") == 0) {
+
+	flag = 2;
+
+	// ensure no segmentation fault if user messes up
+	if (OPS_GetNumRemainingInputArgs() < 2) {
+	    opserr << "WARNING recorder Element .. -eleRange start? end?  .. - no ele tags specified\n";
+	    return -1;
+	}
+
+	//
+	// read in start and end tags of two elements & add set [start,end]
+	//
+
+	int start, end;
+	if (OPS_GetIntInput(&numdata, &start) < 0) {
+	    opserr << "WARNING recorder Element -eleRange start? end? - invalid start\n";
+	    return -1;
+	}
+	if (OPS_GetIntInput(&numdata, &end) < 0) {
+	    opserr << "WARNING recorder Element -eleRange start? end? - invalid end\n ";
+	    return -1;
+	}
+	if (start > end) {
+	    int swap = end;
+	    end = start;
+	    start = swap;
+	}
+	eleIDs[0] = start;
+	eleIDs[1] = end;
+    }
+
+    // all left args
+    std::vector<const char*> argv;
+    while (OPS_GetNumRemainingInputArgs() > 0) {
+	opt = OPS_GetString();
+	if (strcmp(opt, "Invalid String Inpu!") == 0) {
+	    opserr << opt <<"\n";
+	    return -1;
+	}
+	argv.push_back(opt);
+    }
+
+    if (argv.empty()) return 0;
+
+    ElementStateParameter theParameter(newValue, &argv[0], (int)argv.size(), flag, &eleIDs);
+
+    Domain* theDomain = OPS_GetDomain();
+    if (theDomain == 0) return 0;
+    theDomain->addParameter(&theParameter);
 
     return 0;
 }

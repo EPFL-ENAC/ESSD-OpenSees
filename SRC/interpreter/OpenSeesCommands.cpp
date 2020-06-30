@@ -43,7 +43,6 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "OpenSeesCommands.h"
 #include <OPS_Globals.h>
 #include <elementAPI.h>
-#include <StandardStream.h>
 #include <UniaxialMaterial.h>
 #include <NDMaterial.h>
 #include <SectionForceDeformation.h>
@@ -60,6 +59,9 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <DamageModel.h>
 #include <FrictionModel.h>
 #include <HystereticBackbone.h>
+#include <StiffnessDegradation.h>
+#include <StrengthDegradation.h>
+#include <UnloadingRule.h>
 #include <YieldSurface_BC.h>
 #include <CyclicModel.h>
 #include <FileStream.h>
@@ -67,6 +69,7 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <NewtonRaphson.h>
 #include <TransformationConstraintHandler.h>
 #include <Newmark.h>
+#include <GimmeMCK.h>
 #include <ProfileSPDLinSolver.h>
 #include <ProfileSPDLinDirectSolver.h>
 #include <ProfileSPDLinSOE.h>
@@ -95,19 +98,46 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <NewtonLineSearch.h>
 #include <FileDatastore.h>
 #include <Mesh.h>
+#ifdef _MUMPS
+#include <MumpsSolver.h>
+#include <MumpsSOE.h>
+#endif
+#include <BackgroundMesh.h>
 
 #ifdef _PARALLEL_INTERPRETERS
+bool setMPIDSOEFlag = false;
+
 #include <mpi.h>
 #include <MPI_MachineBroker.h>
+#include <ParallelNumberer.h>
+#include <DistributedDisplacementControl.h>
+#include <DistributedBandSPDLinSOE.h>
+#include <DistributedSparseGenColLinSOE.h>
+#include <DistributedSparseGenRowLinSOE.h>
+#include <DistributedBandGenLinSOE.h>
+#include <DistributedDiagonalSOE.h>
+#include <DistributedDiagonalSolver.h>
+#include <MPIDiagonalSOE.h>
+#include <MPIDiagonalSolver.h>
+#define MPIPP_H
+#include <DistributedSuperLU.h>
+#include <DistributedProfileSPDLinSOE.h>
+#ifdef _MUMPS
+#include <MumpsParallelSOE.h>
+#include <MumpsParallelSolver.h>
+#endif
+#elif _PARALLEL_PROCESSING
+#include <mpi.h>
+#include <PartitionedDomain.h>
+#ifdef _MUMPS
+#include <MumpsParallelSOE.h>
+#include <MumpsParallelSolver.h>
+#endif
 #endif
 
 
 // active object
 static OpenSeesCommands* cmds = 0;
-
-// define opserr
-static StandardStream sserr;
-OPS_Stream *opserrPtr = &sserr;
 
 OpenSeesCommands::OpenSeesCommands(DL_Interpreter* interp)
     :interpreter(interp), theDomain(0), ndf(0), ndm(0),
@@ -117,10 +147,25 @@ OpenSeesCommands::OpenSeesCommands(DL_Interpreter* interp)
      thePFEMAnalysis(0),
      theAnalysisModel(0), theTest(0), numEigen(0), theDatabase(0),
      theBroker(), theTimer(), theSimulationInfo(), theMachineBroker(0),
-     reliability(0)
+     theChannels(0), numChannels(0), reliability(0)
 {
 #ifdef _PARALLEL_INTERPRETERS
     theMachineBroker = new MPI_MachineBroker(&theBroker, 0, 0);
+    int rank = theMachineBroker->getPID();
+    int np = theMachineBroker->getNP();
+    if (rank == 0) {
+        theChannels = new Channel *[np-1];
+        numChannels = np-1;
+
+        for (int j=0; j<np-1; j++) {
+            Channel *otherChannel = theMachineBroker->getRemoteProcess();
+            theChannels[j] = otherChannel;
+        }
+    } else {
+        theChannels = new Channel *[1];
+        numChannels = 1;
+        theChannels[0] = theMachineBroker->getMyChannel();
+    }
 #endif
 
     cmds = this;
@@ -138,8 +183,12 @@ OpenSeesCommands::~OpenSeesCommands()
     cmds = 0;
 
 #ifdef _PARALLEL_INTERPRETERS
+    if (theChannels != 0) {
+        delete [] theChannels;
+    }
     if (theMachineBroker != 0) {
-	opserr << "Process "<<theMachineBroker->getPID() << " Terminating\n";
+        // called in cleanup function, opserr not working
+	std::cerr << "Process "<<theMachineBroker->getPID() << " Terminating\n";
 	theMachineBroker->shutdown();
 	delete theMachineBroker;
     }
@@ -284,7 +333,7 @@ OpenSeesCommands::eigen(int typeSolver, double shift,
 	for (int i=0; i<numEigen; i++) {
 	    data[i] = eigenvalues(i);
 	}
-	OPS_SetDoubleOutput(&numEigen, data);
+	OPS_SetDoubleOutput(&numEigen, data, false);
 	delete [] data;
     }
 
@@ -297,7 +346,7 @@ int* OPS_GetNumEigen()
     if (cmds == 0) return 0;                                                    
     numEigen = cmds->getNumEigen();                                             
     int numdata = 1;                                                            
-    if (OPS_SetIntOutput(&numdata, &numEigen) < 0) {                            
+    if (OPS_SetIntOutput(&numdata, &numEigen, true) < 0) {
         opserr << "WARNING failed to set output\n";                             
         return 0;                                                               
     }                                                                           
@@ -527,6 +576,12 @@ OpenSeesCommands::setStaticAnalysis()
     if (theEigenSOE != 0) {
 	theStaticAnalysis->setEigenSOE(*theEigenSOE);
     }
+
+#ifdef _PARALLEL_INTERPRETERS
+    if (setMPIDSOEFlag) {
+        ((MPIDiagonalSOE*)theSOE)->setAnalysisModel(*theAnalysisModel);
+    }
+#endif
 }
 
 int
@@ -607,6 +662,12 @@ OpenSeesCommands::setPFEMAnalysis()
     if (theEigenSOE != 0) {
 	theTransientAnalysis->setEigenSOE(*theEigenSOE);
     }
+
+#ifdef _PARALLEL_INTERPRETERS
+    if (setMPIDSOEFlag) {
+        ((MPIDiagonalSOE*)theSOE)->setAnalysisModel(*theAnalysisModel);
+    }
+#endif
 
     return 0;
 }
@@ -746,7 +807,11 @@ OpenSeesCommands::setTransientAnalysis()
     if (theEigenSOE != 0) {
 	theTransientAnalysis->setEigenSOE(*theEigenSOE);
     }
-
+#ifdef _PARALLEL_INTERPRETERS
+	if (setMPIDSOEFlag) {
+	  ((MPIDiagonalSOE*) theSOE)->setAnalysisModel(*theAnalysisModel);
+	}
+#endif
 }
 
 void
@@ -798,13 +863,14 @@ OpenSeesCommands::wipe()
 	theDatabase = 0;
     }
 
-    // wipe all meshes
-    OPS_clearAllMesh();
-
     // wipe domain
     if (theDomain != 0) {
 	theDomain->clearAll();
     }
+
+    // wipe all meshes
+    OPS_clearAllMesh();
+    OPS_getBgMesh().clearAll();
 
     // time set to zero
     ops_Dt = 0.0;
@@ -837,6 +903,9 @@ OpenSeesCommands::wipe()
 
     // wipe HystereticBackbone
     OPS_clearAllHystereticBackbone();
+    OPS_clearAllStiffnessDegradation();
+    OPS_clearAllStrengthDegradation();
+    OPS_clearAllUnloadingRule();
 
     // wipe YieldSurface_BC
     OPS_clearAllYieldSurface_BC();
@@ -844,6 +913,12 @@ OpenSeesCommands::wipe()
     // wipe CyclicModel
     OPS_clearAllCyclicModel();
 
+    if (reliability != 0) {
+      ReliabilityDomain* theReliabilityDomain = reliability->getDomain();
+      if (theReliabilityDomain != 0) {
+	//theReliabilityDomain->clearAll();
+      }
+    }
 }
 
 void
@@ -874,12 +949,11 @@ int OPS_GetIntInput(int *numData, int*data)
     return interp->getInt(data, *numData);
 }
 
-int OPS_SetIntOutput(int *numData, int*data)
+int OPS_SetIntOutput(int *numData, int*data, bool scalar)
 {
     if (cmds == 0) return 0;
     DL_Interpreter* interp = cmds->getInterpreter();
-    if (numData == 0 || data == 0) return -1;
-    return interp->setInt(data, *numData);
+    return interp->setInt(data, *numData, scalar);
 }
 
 int OPS_GetDoubleInput(int *numData, double *data)
@@ -890,12 +964,11 @@ int OPS_GetDoubleInput(int *numData, double *data)
     return interp->getDouble(data, *numData);
 }
 
-int OPS_SetDoubleOutput(int *numData, double *data)
+int OPS_SetDoubleOutput(int *numData, double *data, bool scalar)
 {
     if (cmds == 0) return 0;
     DL_Interpreter* interp = cmds->getInterpreter();
-    if (numData == 0 || data == 0) return -1;
-    return interp->setDouble(data, *numData);
+    return interp->setDouble(data, *numData, scalar);
 }
 
 const char * OPS_GetString(void)
@@ -932,6 +1005,13 @@ int OPS_GetNDM()
 {
     if (cmds == 0) return 0;
     return cmds->getNDM();
+}
+
+int OPS_Error(char *errorMessage, int length)
+{
+    opserr << errorMessage;
+    opserr << endln;
+    return 0;
 }
 
 int OPS_ResetCurrentInputArg(int cArg)
@@ -1064,8 +1144,14 @@ int OPS_System()
 
 
     } else if (strcmp(type,"MPIDiagonal") == 0) {
+#ifdef _PARALLEL_INTERPRETERS
+        MPIDiagonalSolver* theSolver = new MPIDiagonalSolver();
+        theSOE = new MPIDiagonalSOE(*theSolver);
+        setMPIDSOEFlag = true;
+#else
 	// Diagonal SOE & SOLVER
 	theSOE = (LinearSOE*)OPS_DiagonalDirectSolver();
+#endif
 
     } else if (strcmp(type,"SProfileSPD") == 0) {
 	// PROFILE SPD SOE * SOLVER
@@ -1075,6 +1161,20 @@ int OPS_System()
     } else if (strcmp(type, "ProfileSPD") == 0) {
 
 	theSOE = (LinearSOE*)OPS_ProfileSPDLinDirectSolver();
+
+#ifdef _PARALLEL_INTERPRETERS
+    } else if (strcmp(type, "ParallelProfileSPD") == 0) {
+        ProfileSPDLinSolver* theSolver = new ProfileSPDLinDirectSolver();
+        DistributedProfileSPDLinSOE* theParallelSOE = new DistributedProfileSPDLinSOE(*theSolver);
+        theSOE = theParallelSOE;
+        auto theMachineBroker = cmds->getMachineBroker();
+        auto rank = theMachineBroker->getPID();
+        auto numChannels = cmds->getNumChannels();
+        auto theChannels = cmds->getChannels();
+        theParallelSOE->setProcessID(rank);
+        theParallelSOE->setChannels(numChannels, theChannels);
+    
+#endif
 
     } else if (strcmp(type, "PFEM") == 0) {
 	// PFEM SOE & SOLVER
@@ -1089,50 +1189,13 @@ int OPS_System()
 
 		theSOE = (LinearSOE*)OPS_PFEMCompressibleSolver();
 
-	    } else if (strcmp(type, "-laplace") == 0) {
+	    } else if(strcmp(type, "-mumps") == 0) {
+		
+	    	theSOE = (LinearSOE*)OPS_PFEMSolver_Mumps();
 
-	    	theSOE = (LinearSOE*)OPS_PFEMSolver_Laplace();
-	    } else if (strcmp(type, "-lumpM") == 0) {
-	    	theSOE = (LinearSOE*)OPS_PFEMSolver_LumpM();		
-
-	    // } else if(strcmp(type, "-umfpack") == 0) {
-
-	    // 	theSOE = (LinearSOE*)OPS_PFEMSolver_Umfpack();
-
-	    // } else if(strcmp(type, "-diag") == 0) {
-
-	    // 	theSOE = (LinearSOE*)OPS_PFEMDiaSolver();
-
-	    // } else if(strcmp(type, "-egen") == 0) {
-
-	    //  theSOE = (LinearSOE*)OPS_EgenSolver();
-
-	    } else if (strcmp(type,"-mumps") ==0) {
-// #ifdef _PARALLEL_INTERPRETERS
-// 	    int relax = 20;
-// 	    if (argc > 3) {
-// 		if (Tcl_GetInt(interp, argv[3], &relax) != TCL_OK) {
-// 		    opserr<<"WARNING: failed to read relax\n";
-// 		    return TCL_ERROR;
-// 		}
-// 	    }
-// 	    PFEMSolver_Mumps* theSolver = new PFEMSolver_Mumps(relax,0,0,0);
-// 	    theSOE = new PFEMLinSOE(*theSolver);
-// #endif
-	    } else if (strcmp(type,"-quasi-mumps")==0) {
-// #ifdef _PARALLEL_INTERPRETERS
-// 	    int relax = 20;
-// 	    if (argc > 3) {
-// 		if (Tcl_GetInt(interp, argv[3], &relax) != TCL_OK) {
-// 		    opserr<<"WARNING: failed to read relax\n";
-// 		    return TCL_ERROR;
-// 		}
-// 	    }
-// 	    PFEMCompressibleSolver_Mumps* theSolver = new PFEMCompressibleSolver_Mumps(relax,0,0);
-// 	    theSOE = new PFEMCompressibleLinSOE(*theSolver);
-// #endif
-
-	    }
+	    } else if (strcmp(type, "-umfpack") == 0) {
+	    theSOE = (LinearSOE*)OPS_PFEMSolver_Umfpack();
+        }
 	}
 
 
@@ -1159,7 +1222,7 @@ int OPS_System()
     } else if (strcmp(type,"Petsc") == 0) {
 
     } else if (strcmp(type,"Mumps") == 0) {
-
+        theSOE = (LinearSOE*)OPS_MumpsSolver();
 
     } else {
     	opserr<<"WARNING unknown system type "<<type<<"\n";
@@ -1196,8 +1259,15 @@ int OPS_Numberer()
 
     } else if (strcmp(type,"AMD") == 0) {
 
-    	AMD *theAMD = new AMD();
-    	theNumberer = new DOF_Numberer(*theAMD);
+        AMD *theAMD = new AMD();
+        theNumberer = new DOF_Numberer(*theAMD);
+    } else if (strcmp(type, "ParallelPlain") == 0) {
+
+        theNumberer = (DOF_Numberer*)OPS_ParallelNumberer();
+
+    } else if (strcmp(type, "ParallelRCM") == 0) {
+
+        theNumberer = (DOF_Numberer*)OPS_ParallelRCM();
 
     } else {
     	opserr<<"WARNING unknown numberer type "<<type<<"\n";
@@ -1330,6 +1400,10 @@ int OPS_Integrator()
 
 	si = (StaticIntegrator*)OPS_DisplacementControlIntegrator();
 
+    } else if (strcmp(type,"ParallelDisplacementControl") == 0) {
+
+        si = (StaticIntegrator*)OPS_ParallelDisplacementControl();
+
     } else if (strcmp(type,"ArcLength") == 0) {
 	si = (StaticIntegrator*)OPS_ArcLength();
 
@@ -1344,6 +1418,9 @@ int OPS_Integrator()
 
     } else if (strcmp(type,"Newmark") == 0) {
 	ti = (TransientIntegrator*)OPS_Newmark();
+
+    } else if (strcmp(type,"GimmeMCK") == 0 || strcmp(type,"ZZTop") == 0) {
+	ti = (TransientIntegrator*)OPS_GimmeMCK();
 
     } else if (strcmp(type,"TRBDF2") == 0 || strcmp(type,"Bathe") == 0) {
 	ti = (TransientIntegrator*)OPS_TRBDF2();
@@ -1461,6 +1538,9 @@ int OPS_Integrator()
 
     } else if (strcmp(type,"CentralDifferenceNoDamping") == 0) {
 	ti = (TransientIntegrator*)OPS_CentralDifferenceNoDamping();
+
+	} else if (strcmp(type, "ExplicitDifference") == 0) {
+    ti = (TransientIntegrator*)OPS_Explicitdifference();
 
     } else {
 	opserr<<"WARNING unknown integrator type "<<type<<"\n";
@@ -1624,7 +1704,7 @@ int OPS_analyze()
     }
 
     int numdata = 1;
-    if (OPS_SetIntOutput(&numdata, &result) < 0) {
+    if (OPS_SetIntOutput(&numdata, &result, true) < 0) {
 	opserr<<"WARNING failed to set output\n";
 	return -1;
     }
@@ -1725,6 +1805,7 @@ int OPS_resetModel()
     if (theTransientIntegrator != 0) {
 	theTransientIntegrator->revertToStart();
     }
+
     return 0;
 }
 
@@ -1757,7 +1838,8 @@ int OPS_printA()
     FileStream outputFile;
     OPS_Stream *output = &opserr;
 
-    if (OPS_GetNumRemainingInputArgs() > 1) {
+    bool ret = false;
+    if (OPS_GetNumRemainingInputArgs() > 0) {
 	const char* flag = OPS_GetString();
 
 	if ((strcmp(flag,"file") == 0) || (strcmp(flag,"-file") == 0)) {
@@ -1768,6 +1850,8 @@ int OPS_printA()
 		return -1;
 	    }
 	    output = &outputFile;
+	} else if((strcmp(flag,"ret") == 0) || (strcmp(flag,"-ret") == 0)) {
+	    ret = true;
 	}
     }
 
@@ -1782,10 +1866,42 @@ int OPS_printA()
 	    theTransientIntegrator->formTangent(0);
 	}
 
-	const Matrix *A = theSOE->getA();
+    PFEMLinSOE* pfemsoe = dynamic_cast<PFEMLinSOE*>(theSOE);
+    if (pfemsoe != 0) {
+        pfemsoe->saveK(*output);
+        outputFile.close();
+        return 0;
+    }
+
+	Matrix *A = const_cast<Matrix*>(theSOE->getA());
 	if (A != 0) {
-	    *output << *A;
+	    if (ret) {
+		int size = A->noRows() * A->noCols();
+		if (size >0) {
+		    double& ptr = (*A)(0,0);
+		    if (OPS_SetDoubleOutput(&size, &ptr, false) < 0) {
+			opserr << "WARNING: printA - failed to set output\n";
+			return -1;
+		    }
+		}
+	    } else {
+		*output << *A;
+	    }
+	} else {
+        int size = 0;
+        double *ptr = 0;
+        if (OPS_SetDoubleOutput(&size, ptr, false) < 0) {
+            opserr << "WARNING: printA - failed to set output\n";
+            return -1;
+        }
 	}
+    } else {
+        int size = 0;
+        double *ptr = 0;
+        if (OPS_SetDoubleOutput(&size, ptr, false) < 0) {
+            opserr << "WARNING: printA - failed to set output\n";
+            return -1;
+        }
     }
 
     // close the output file
@@ -1804,7 +1920,8 @@ int OPS_printB()
     StaticIntegrator* theStaticIntegrator = cmds->getStaticIntegrator();
     TransientIntegrator* theTransientIntegrator = cmds->getTransientIntegrator();
 
-    if (OPS_GetNumRemainingInputArgs() > 1) {
+    bool ret = false;
+    if (OPS_GetNumRemainingInputArgs() > 0) {
 	const char* flag = OPS_GetString();
 
 	if ((strcmp(flag,"file") == 0) || (strcmp(flag,"-file") == 0)) {
@@ -1815,6 +1932,8 @@ int OPS_printB()
 		return -1;
 	    }
 	    output = &outputFile;
+	} else if((strcmp(flag,"ret") == 0) || (strcmp(flag,"-ret") == 0)) {
+	    ret = true;
 	}
     }
     if (theSOE != 0) {
@@ -1824,8 +1943,33 @@ int OPS_printB()
 	    theTransientIntegrator->formTangent(0);
 	}
 
-	const Vector &b = theSOE->getB();
-	*output << b;
+	Vector &b = const_cast<Vector&>(theSOE->getB());
+	if (ret) {
+	    int size = b.Size();
+	    if (size > 0) {
+		double &ptr = b(0);
+		if (OPS_SetDoubleOutput(&size, &ptr, false) < 0) {
+		    opserr << "WARNING: printb - failed to set output\n";
+		    return -1;
+		}
+	    } else {
+            size = 0;
+            double *ptr2 = 0;
+            if (OPS_SetDoubleOutput(&size, ptr2, false) < 0) {
+                opserr << "WARNING: printA - failed to set output\n";
+                return -1;
+            }
+	    }
+	} else {
+	    *output << b;
+	}
+    } else {
+        int size = 0;
+        double *ptr = 0;
+        if (OPS_SetDoubleOutput(&size, ptr, false) < 0) {
+            opserr << "WARNING: printA - failed to set output\n";
+            return -1;
+        }
     }
 
     // close the output file
@@ -2298,7 +2442,7 @@ int OPS_getCTestNorms()
 	    data[i] = norms(i);
 	}
 
-	if (OPS_SetDoubleOutput(&numdata, data) < 0) {
+	if (OPS_SetDoubleOutput(&numdata, data, false) < 0) {
 	    opserr << "WARNING failed to set test norms\n";
 	    delete [] data;
 	    return -1;
@@ -2319,7 +2463,7 @@ int OPS_getCTestIter()
     if (theTest != 0) {
 	int res = theTest->getNumTests();
 	int numdata = 1;
-	if (OPS_SetIntOutput(&numdata, &res) < 0) {
+	if (OPS_SetIntOutput(&numdata, &res, true) < 0) {
 	    opserr << "WARNING failed to set test iter\n";
 	    return -1;
 	}
@@ -2457,19 +2601,37 @@ int OPS_modalDamping()
     EigenSOE* theEigenSOE = cmds->getEigenSOE();
 
     if (numEigen == 0 || theEigenSOE == 0) {
-	opserr << "WARINING - modalDmping - eigen command needs to be called first - NO MODAL DAMPING APPLIED\n ";
+	opserr << "WARINING modalDamping - eigen command needs to be called first - NO MODAL DAMPING APPLIED\n ";
 	return -1;
+    }
+
+    int numModes = OPS_GetNumRemainingInputArgs();
+    if (numModes != 1 && numModes != numEigen) {
+      opserr << "WARNING modalDamping - same #damping factors as modes must be specified\n";
+      opserr << "                     - same damping ratio will be applied to all modes\n";
     }
 
     double factor;
-    int numdata = 1;
-    if (OPS_GetDoubleInput(&numdata, &factor) < 0) {
-	opserr << "WARNING rayleigh alphaM? betaK? betaK0? betaKc? - could not read betaK? \n";
-	return -1;
-    }
-
     Vector modalDampingValues(numEigen);
-    for (int i=0; i<numEigen; i++) {
+    int numdata = 1;
+
+    //
+    // read in values and set factors
+    //
+    if (numModes == numEigen) {
+      for (int i = 0; i < numEigen; i++) {
+	if (OPS_GetDoubleInput(&numdata, &factor) < 0) {
+	  opserr << "WARNING modalDamping - could not read factor for mode " << i+1 << endln;
+	  return -1;
+	}
+	modalDampingValues(i) = factor;
+      }
+    } else {
+      if (OPS_GetDoubleInput(&numdata, &factor) < 0) {
+	opserr << "WARNING modalDamping - could not read factor for all modes \n";
+	return -1;
+      }
+      for (int i = 0; i < numEigen; i++)
 	modalDampingValues(i) = factor;
     }
 
@@ -2493,14 +2655,14 @@ int OPS_modalDampingQ()
     EigenSOE* theEigenSOE = cmds->getEigenSOE();
 
     if (numEigen == 0 || theEigenSOE == 0) {
-	opserr << "WARINING - modalDmping - eigen command needs to be called first - NO MODAL DAMPING APPLIED\n ";
+	opserr << "WARINING modalDamping - eigen command needs to be called first - NO MODAL DAMPING APPLIED\n ";
 	return -1;
     }
 
     double factor;
     int numdata = 1;
     if (OPS_GetDoubleInput(&numdata, &factor) < 0) {
-	opserr << "WARNING rayleigh alphaM? betaK? betaK0? betaKc? - could not read betaK? \n";
+	opserr << "WARNING modalDamping - could not read factor for all modes \n";
 	return -1;
     }
 
@@ -2576,57 +2738,6 @@ int OPS_neesMetaData()
 	    return -1;
 	}
     }
-    return 0;
-}
-
-int OPS_neesUpload()
-{
-    if (cmds == 0) return 0;
-    if (OPS_GetNumRemainingInputArgs() < 2) {
-	opserr << "WARNING neesUpload -user isername? -pass passwd? -proj projID? -exp expID? -title title? -description description\n";
-	return -1;
-    }
-    int projID =0;
-    int expID =0;
-    const char *userName =0;
-    const char *userPasswd =0;
-
-    SimulationInformation* simulationInfo = cmds->getSimulationInformation();
-    if (simulationInfo == 0) return -1;
-
-    int numdata = 1;
-    while (OPS_GetNumRemainingInputArgs() > 1) {
-	const char* flag = OPS_GetString();
-
-	if (strcmp(flag,"-user") == 0) {
-	    userName = OPS_GetString();
-
-	} else if (strcmp(flag,"-pass") == 0) {
-	    userPasswd = OPS_GetString();
-
-	} else if (strcmp(flag,"-projID") == 0) {
-	    if (OPS_GetIntInput(&numdata, &projID) < 0) {
-		opserr << "WARNING neesUpload -invalid expID\n";
-		return -1;
-	    }
-
-	} else if (strcmp(flag,"-expID") == 0) {
-	    if (OPS_GetIntInput(&numdata, &expID) < 0) {
-		opserr << "WARNING neesUpload -invalid expID\n";
-		return -1;
-	    }
-
-	} else if (strcmp(flag,"-title") == 0) {
-	    simulationInfo->setTitle(OPS_GetString());
-
-	} else if (strcmp(flag,"-description") == 0) {
-	    simulationInfo->setDescription(OPS_GetString());
-
-	}
-    }
-
-    simulationInfo->neesUpload(userName, userPasswd, projID, expID);
-
     return 0;
 }
 
@@ -2845,7 +2956,7 @@ int OPS_totalCPU()
 
     double value = theAlgorithm->getTotalTimeCPU();
     int numdata = 1;
-    if (OPS_SetDoubleOutput(&numdata, &value) < 0) {
+    if (OPS_SetDoubleOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
@@ -2864,7 +2975,7 @@ int OPS_solveCPU()
 
     double value = theAlgorithm->getSolveTimeCPU();
     int numdata = 1;
-    if (OPS_SetDoubleOutput(&numdata, &value) < 0) {
+    if (OPS_SetDoubleOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
@@ -2883,7 +2994,7 @@ int OPS_accelCPU()
 
     double value = theAlgorithm->getAccelTimeCPU();
     int numdata = 1;
-    if (OPS_SetDoubleOutput(&numdata, &value) < 0) {
+    if (OPS_SetDoubleOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
@@ -2902,7 +3013,7 @@ int OPS_numFact()
 
     double value = theAlgorithm->getNumFactorizations();
     int numdata = 1;
-    if (OPS_SetDoubleOutput(&numdata, &value) < 0) {
+    if (OPS_SetDoubleOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
@@ -2921,7 +3032,7 @@ int OPS_numIter()
 
     int value = theAlgorithm->getNumIterations();
     int numdata = 1;
-    if (OPS_SetIntOutput(&numdata, &value) < 0) {
+    if (OPS_SetIntOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
@@ -2938,14 +3049,174 @@ int OPS_systemSize()
 	return -1;
     }
 
-    double value = theSOE->getNumEqn();
+    int value = theSOE->getNumEqn();
     int numdata = 1;
-    if (OPS_SetDoubleOutput(&numdata, &value) < 0) {
+    if (OPS_SetIntOutput(&numdata, &value, true) < 0) {
 	opserr << "WARNING failed to set output\n";
 	return -1;
     }
 
     return 0;
+}
+
+void* OPS_ParallelRCM() {
+
+#ifdef _PARALLEL_INTERPRETERS
+    ParallelNumberer *theParallelNumberer = 0;
+    if (cmds == 0) return theParallelNumberer;
+
+    MachineBroker* machine = cmds->getMachineBroker();
+    Channel** channels = cmds->getChannels();
+    int numChannels = cmds->getNumChannels();
+
+    int rank = machine->getPID();
+
+    RCM *theRCM = new RCM(false);
+    theParallelNumberer = new ParallelNumberer(*theRCM);
+    theParallelNumberer->setProcessID(rank);
+    theParallelNumberer->setChannels(numChannels, channels);
+
+    return theParallelNumberer;
+#else
+    return 0;
+#endif
+
+}
+
+void* OPS_ParallelNumberer() {
+
+#ifdef _PARALLEL_INTERPRETERS
+    ParallelNumberer *theParallelNumberer = 0;
+    if (cmds == 0) return theParallelNumberer;
+
+    MachineBroker* machine = cmds->getMachineBroker();
+    Channel** channels = cmds->getChannels();
+    int numChannels = cmds->getNumChannels();
+
+    int rank = machine->getPID();
+
+    theParallelNumberer = new ParallelNumberer;
+    theParallelNumberer->setProcessID(rank);
+    theParallelNumberer->setChannels(numChannels, channels);
+
+    return theParallelNumberer;
+#else
+    return 0;
+#endif
+}
+
+void* OPS_ParallelDisplacementControl() {
+#ifdef _PARALLEL_INTERPRETERS
+    DistributedDisplacementControl *theDDC = 0;
+    if (cmds == 0) {
+        return theDDC;
+    }
+    int idata[3];
+    double ddata[3];
+
+    if (OPS_GetNumRemainingInputArgs() < 3) {
+        opserr << "WARNING integrator DistributedDisplacementControl node dof dU \n";
+        opserr << "<Jd minIncrement maxIncrement>\n";
+        return 0;
+    }
+
+    int num = 2;
+    if (OPS_GetIntInput(&num, &idata[0]) < 0) {
+        opserr << "WARNING: failed to get node and dof\n";
+        return 0;
+    }
+    num = 1;
+    if (OPS_GetDoubleInput(&num, &ddata[0]) < 0) {
+        opserr << "WARNING: failed to get dU\n";
+        return 0;
+    }
+    if (OPS_GetNumRemainingInputArgs() >= 3) {
+        num = 1;
+        if (OPS_GetIntInput(&num, &idata[2]) < 0) {
+            opserr << "WARNING: failed to get Jd\n";
+            return 0;
+        }
+        num = 2;
+        if (OPS_GetDoubleInput(&num, &ddata[1]) < 0) {
+            opserr << "WARNING: failed to get min and max\n";
+            return 0;
+        }
+    } else {
+        idata[2] = 1;
+        ddata[1] = ddata[0];
+        ddata[2] = ddata[0];
+    }
+
+    theDDC = new DistributedDisplacementControl(idata[0], idata[1]-1,
+                                                ddata[0], idata[2],
+                                                ddata[1], ddata[2]);
+    MachineBroker* machine = cmds->getMachineBroker();
+    Channel** channels = cmds->getChannels();
+    int numChannels = cmds->getNumChannels();
+
+    int rank = machine->getPID();
+    theDDC->setProcessID(rank);
+    theDDC->setChannels(numChannels, channels);
+    return theDDC;
+#else
+    return 0;
+#endif
+
+}
+
+void* OPS_MumpsSolver() {
+    int icntl14 = 20;
+    int icntl7 = 7;
+    int matType = 0; // 0: unsymmetric, 1: symmetric positive definite, 2: symmetric general
+    while (OPS_GetNumRemainingInputArgs() > 2) {
+        const char* opt = OPS_GetString();
+        int num = 1;
+        if (strcmp(opt, "-ICNTL14") == 0) {
+            if (OPS_GetIntInput(&num, &icntl14) < 0) {
+                opserr << "WARNING: failed to get icntl14\n";
+                return 0;
+            }
+        } else if (strcmp(opt, "-ICNTL7") == 0) {
+            if (OPS_GetIntInput(&num, &icntl7) < 0) {
+                opserr << "WARNING: failed to get icntl7\n";
+                return 0;
+            }
+        } else if (strcmp(opt, "-matrixType") == 0) {
+            if (OPS_GetIntInput(&num, &matType) < 0) {
+                opserr << "WARNING: failed to get -matrixType. Unsymmetric matrix assumed\n";
+                return 0;
+            }
+            if (matType < 0 || matType > 2) {
+                opserr << "Mumps Warning: wrong -matrixType value (" << matType << "). Unsymmetric matrix assumed\n";
+                matType = 0;
+            }
+        }
+    }
+
+#ifdef _PARALLEL_INTERPRETERS
+#ifdef _MUMPS
+    MumpsParallelSOE* soe = 0;
+
+    MumpsParallelSolver *solver= new MumpsParallelSolver(icntl7, icntl14);
+    soe = new MumpsParallelSOE(*solver, matType);
+
+    MachineBroker* machine = cmds->getMachineBroker();
+    Channel** channels = cmds->getChannels();
+    int numChannels = cmds->getNumChannels();
+
+    int rank = machine->getPID();
+    soe->setProcessID(rank);
+    soe->setChannels(numChannels, channels);
+    return soe;
+#endif
+#else
+#ifdef _MUMPS
+    MumpsSolver *theSolver = new MumpsSolver(icntl7, icntl14);
+    theSOE = new MumpsSOE(*theSolver, matType);
+    return theSOE;
+#endif
+#endif
+
 }
 
 // Sensitivity:BEGIN /////////////////////////////////////////////

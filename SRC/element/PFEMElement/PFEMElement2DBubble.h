@@ -116,10 +116,13 @@ private:
     static Matrix K;
     static Vector P;
     static Matrix C;
+    Matrix M, D;
+    Vector F, Fp;
 
     void setJ();
     void setdJ();
     static void setC();
+    int updateMatrix();
 
     // responses
     double getM() const;
@@ -128,7 +131,7 @@ private:
     void getK(Matrix& k) const;
     void getKbub(Matrix& kbub) const;
     void getGbub(Matrix& gbub)const;
-    double getinvMbub() const;
+    double getMbub() const;
     void getL(Matrix& l) const;
     void getF(Vector& f) const;
     void getFbub(Vector& fbub) const;

@@ -157,6 +157,14 @@ static int Tcl_ops_wipe(ClientData clientData, Tcl_Interp *interp, int argc,   T
     return TCL_OK;
 }
 
+static int Tcl_ops_wipeReliability(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_wipeReliability() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
 static int Tcl_ops_model(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
     wrapper->resetCommandLine(argc, 1, argv);
 
@@ -461,6 +469,14 @@ static int Tcl_ops_getTime(ClientData clientData, Tcl_Interp *interp, int argc, 
     return TCL_OK;
 }
 
+static int Tcl_ops_setCreep(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_setCreep() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
 static int Tcl_ops_eleResponse(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
     wrapper->resetCommandLine(argc, 1, argv);
 
@@ -725,6 +741,14 @@ static int Tcl_ops_eleNodes(ClientData clientData, Tcl_Interp *interp, int argc,
     return TCL_OK;
 }
 
+static int Tcl_ops_nodeDOFs(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_nodeDOFs() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
 static int Tcl_ops_nodeMass(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
     wrapper->resetCommandLine(argc, 1, argv);
 
@@ -833,14 +857,6 @@ static int Tcl_ops_defaultUnits(ClientData clientData, Tcl_Interp *interp, int a
     wrapper->resetCommandLine(argc, 1, argv);
 
     if (OPS_defaultUnits() < 0) return TCL_ERROR;
-
-    return TCL_OK;
-}
-
-static int Tcl_ops_neesUpload(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
-    wrapper->resetCommandLine(argc, 1, argv);
-
-    if (OPS_neesUpload() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1149,11 +1165,19 @@ static int Tcl_ops_updateParameter(ClientData clientData, Tcl_Interp *interp, in
     return TCL_OK;
 }
 
+static int Tcl_ops_setParameter(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv) {
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_setParameter() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
 static int Tcl_ops_getPID(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
 {
     wrapper->resetCommandLine(argc, 1, argv);
 
-    //if (OPS_getPID() < 0) return TCL_ERROR;
+    if (OPS_getPID() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1162,7 +1186,7 @@ static int Tcl_ops_getNP(ClientData clientData, Tcl_Interp *interp, int argc,   
 {
     wrapper->resetCommandLine(argc, 1, argv);
 
-    //if (OPS_getNP() < 0) return TCL_ERROR;
+    if (OPS_getNP() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1171,7 +1195,7 @@ static int Tcl_ops_barrier(ClientData clientData, Tcl_Interp *interp, int argc, 
 {
     wrapper->resetCommandLine(argc, 1, argv);
 
-    //if (OPS_barrier() < 0) return TCL_ERROR;
+    if (OPS_barrier() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1180,7 +1204,7 @@ static int Tcl_ops_send(ClientData clientData, Tcl_Interp *interp, int argc,   T
 {
     wrapper->resetCommandLine(argc, 1, argv);
 
-    //if (OPS_send() < 0) return TCL_ERROR;
+    if (OPS_send() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1189,7 +1213,16 @@ static int Tcl_ops_recv(ClientData clientData, Tcl_Interp *interp, int argc,   T
 {
     wrapper->resetCommandLine(argc, 1, argv);
 
-    //if (OPS_recv() < 0) return TCL_ERROR;
+    if (OPS_recv() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_Bcast(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_Bcast() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1284,6 +1317,87 @@ static int Tcl_ops_randomVariable(ClientData clientData, Tcl_Interp *interp, int
     return TCL_OK;
 }
 
+static int Tcl_ops_getRVTags(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getRVTags() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_getRVMean(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getRVMean() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_getRVStdv(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getRVStdv() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_getRVPDF(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getRVPDF() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_getRVCDF(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getRVCDF() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_getRVInverseCDF(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getRVInverseCDF() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_addCorrelate(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_addCorrelate() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_probabilityTransformation(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_probabilityTransformation() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_transformUtoX(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_transformUtoX() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
 static int Tcl_ops_updateMaterialStage(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
 {
     wrapper->resetCommandLine(argc, 1, argv);
@@ -1298,6 +1412,87 @@ static int Tcl_ops_sdfResponse(ClientData clientData, Tcl_Interp *interp, int ar
     wrapper->resetCommandLine(argc, 1, argv);
 
     if (OPS_sdfResponse() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_getNumThreads(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_getNumThreads() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_setNumThreads(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_setNumThreads() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_logFile(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_logFile() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_setStartNodeTag(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_setStartNodeTag() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_hystereticBackbone(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_hystereticBackbone() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_stiffnessDegradation(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_stiffnessDegradation() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_strengthDegradation(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_strengthDegradation() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_unloadingRule(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_unloadingRule() < 0) return TCL_ERROR;
+
+    return TCL_OK;
+}
+
+static int Tcl_ops_partition(ClientData clientData, Tcl_Interp *interp, int argc,   TCL_Char **argv)
+{
+    wrapper->resetCommandLine(argc, 1, argv);
+
+    if (OPS_partition() < 0) return TCL_ERROR;
 
     return TCL_OK;
 }
@@ -1353,6 +1548,7 @@ TclWrapper::addOpenSeesCommands(Tcl_Interp* interp)
     addCommand(interp,"equalDOF", &Tcl_ops_equalDOF);
     addCommand(interp,"nodeEigenvector", &Tcl_ops_nodeEigenvector);
     addCommand(interp,"getTime", &Tcl_ops_getTime);
+    addCommand(interp,"setCreep", &Tcl_ops_setCreep);
     addCommand(interp,"eleResponse", &Tcl_ops_eleResponse);
     addCommand(interp,"sp", &Tcl_ops_SP);
     addCommand(interp,"fixX", &Tcl_ops_fixX);
@@ -1386,6 +1582,7 @@ TclWrapper::addOpenSeesCommands(Tcl_Interp* interp)
     addCommand(interp,"setNodeCoord", &Tcl_ops_setNodeCoord);
     addCommand(interp,"updateElementDomain", &Tcl_ops_updateElementDomain);
     addCommand(interp,"eleNodes", &Tcl_ops_eleNodes);
+    addCommand(interp,"nodeDOFs", &Tcl_ops_nodeDOFs);
     addCommand(interp,"nodeMass", &Tcl_ops_nodeMass);
     addCommand(interp,"nodePressure", &Tcl_ops_nodePressure);
     addCommand(interp,"nodeBounds", &Tcl_ops_nodeBounds);
@@ -1401,7 +1598,6 @@ TclWrapper::addOpenSeesCommands(Tcl_Interp* interp)
     addCommand(interp,"record", &Tcl_ops_record);
     addCommand(interp,"metaData", &Tcl_ops_metaData);
     addCommand(interp,"defaultUnits", &Tcl_ops_defaultUnits);
-    addCommand(interp,"neesUpload", &Tcl_ops_neesUpload);
     addCommand(interp,"stripXML", &Tcl_ops_stripXML);
     addCommand(interp,"convertBinaryToText", &Tcl_ops_convertBinaryToText);
     addCommand(interp,"convertTextToBinary", &Tcl_ops_convertTextToBinary);
@@ -1441,11 +1637,13 @@ TclWrapper::addOpenSeesCommands(Tcl_Interp* interp)
     addCommand(interp,"parameter", &Tcl_ops_parameter);
     addCommand(interp,"addToParameter", &Tcl_ops_addToParameter);
     addCommand(interp,"updateParameter", &Tcl_ops_updateParameter);
+    addCommand(interp,"setParameter", &Tcl_ops_setParameter);
     addCommand(interp,"getPID", &Tcl_ops_getPID);
     addCommand(interp,"getNP", &Tcl_ops_getNP);
     addCommand(interp,"barrier", &Tcl_ops_barrier);
     addCommand(interp,"send", &Tcl_ops_send);
     addCommand(interp,"recv", &Tcl_ops_recv);
+    addCommand(interp,"Bcast", &Tcl_ops_Bcast);
     addCommand(interp,"frictionModel", &Tcl_ops_frictionModel);
     addCommand(interp,"computeGradients", &Tcl_ops_computeGradients);
     addCommand(interp,"sensitivityAlgorithm", &Tcl_ops_sensitivityAlgorithm);
@@ -1456,6 +1654,24 @@ TclWrapper::addOpenSeesCommands(Tcl_Interp* interp)
     addCommand(interp,"sensSectionForce", &Tcl_ops_sensSectionForce);
     addCommand(interp,"sensNodePressure", &Tcl_ops_sensNodePressure);
     addCommand(interp,"randomVariable", &Tcl_ops_randomVariable);
+    addCommand(interp,"getRVTags", &Tcl_ops_getRVTags);
+    addCommand(interp,"getMean", &Tcl_ops_getRVMean);
+    addCommand(interp,"getStdv", &Tcl_ops_getRVStdv);
+    addCommand(interp,"getPDF", &Tcl_ops_getRVPDF);
+    addCommand(interp,"getCDF", &Tcl_ops_getRVCDF);
+    addCommand(interp,"getInverseCDF", &Tcl_ops_getRVInverseCDF);
+    addCommand(interp,"correlate", &Tcl_ops_addCorrelate);
+    addCommand(interp,"transformUtoX", &Tcl_ops_transformUtoX);
     addCommand(interp,"updateMaterialStage", &Tcl_ops_updateMaterialStage);
     addCommand(interp,"sdfResponse", &Tcl_ops_sdfResponse);
+    addCommand(interp,"probabilityTransformation", &Tcl_ops_probabilityTransformation);
+    addCommand(interp,"getNumThreads", &Tcl_ops_getNumThreads);
+    addCommand(interp,"setNumThreads", &Tcl_ops_setNumThreads);
+    addCommand(interp,"logFile", &Tcl_ops_logFile);
+    addCommand(interp,"setStartNodeTag", &Tcl_ops_setStartNodeTag);
+    addCommand(interp,"hystereticBackbone", &Tcl_ops_hystereticBackbone);
+    addCommand(interp,"strengthDegradation", &Tcl_ops_stiffnessDegradation);
+    addCommand(interp,"stiffnessDegradation", &Tcl_ops_strengthDegradation);
+    addCommand(interp,"unloadingRule", &Tcl_ops_unloadingRule);
+    addCommand(interp,"partition", &Tcl_ops_partition);
 }

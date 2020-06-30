@@ -943,6 +943,10 @@ FiberSection2d::setResponse(const char **argv, int argc,
     int count = 0;
     return theResponse = new MaterialResponse(this, 7, count);
   }
+  //by SAJalali
+  else if ((strcmp(argv[0], "energy") == 0) || (strcmp(argv[0], "Energy") == 0)) {
+	  return theResponse = new MaterialResponse(this, 8, getEnergy());
+  }
 
 // If not a fiber response, call the base class method
 return SectionForceDeformation::setResponse(argv, argc, output);
@@ -990,6 +994,10 @@ FiberSection2d::getResponse(int responseID, Information &sectInfo)
 
     return sectInfo.setInt(count);
   } 
+  //by SAJalali
+  else if (responseID == 8) {
+	  return sectInfo.setDouble(getEnergy());
+  }
 
   return SectionForceDeformation::getResponse(responseID, sectInfo);
 }
@@ -1072,7 +1080,7 @@ FiberSection2d::setParameter(const char **argv, int argc, Parameter &param)
   }
 
   // Check if it belongs to the section integration
-  else if (strstr(argv[0],"integration") != 0) {
+  if (strstr(argv[0],"integration") != 0) {
     if (sectionIntegr != 0)
       return sectionIntegr->setParameter(&argv[1], argc-1, param);
     else
@@ -1080,7 +1088,7 @@ FiberSection2d::setParameter(const char **argv, int argc, Parameter &param)
   }
 
   int ok = 0;
-  
+
   for (int i = 0; i < numFibers; i++) {
     ok = theMaterials[i]->setParameter(argv, argc, param);
     if (ok != -1)
@@ -1290,3 +1298,25 @@ FiberSection2d::commitSensitivity(const Vector& defSens,
 }
 
 // AddingSensitivity:END ///////////////////////////////////
+
+//by SAJalali
+double FiberSection2d::getEnergy() const
+{
+	static double fiberArea[10000];
+
+	if (sectionIntegr != 0) {
+		sectionIntegr->getFiberWeights(numFibers, fiberArea);
+	}
+	else {
+		for (int i = 0; i < numFibers; i++) {
+			fiberArea[i] = matData[2 * i + 1];
+		}
+	}
+	double energy = 0;
+	for (int i = 0; i < numFibers; i++)
+	{
+		double A = fiberArea[i];
+		energy += A * theMaterials[i]->getEnergy();
+	}
+	return energy;
+}
