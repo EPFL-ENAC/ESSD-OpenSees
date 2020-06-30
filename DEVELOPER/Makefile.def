@@ -14,7 +14,7 @@ C++FLAGS	= -O3
 CFLAGS		= -O2
 FFLAGS		= -O 
 
-INCLUDES = -I../core -I../../core
+INCLUDES = -I../core -I../../core -I../../../core -I../../../../core
 
 .cpp.o:
 	@$(ECHO) Making $@ from $<

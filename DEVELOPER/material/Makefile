@@ -3,8 +3,8 @@ include ../Makefile.def
 all:
 	echo @pwd;
 	@$(CD) cpp; $(MAKE);
-	@$(CD) c; $(MAKE);
-	@$(CD) fortran; $(MAKE);
+#	@$(CD) c; $(MAKE);
+#	@$(CD) fortran; $(MAKE);
 
 # Miscellaneous
 tidy:
@@ -12,8 +12,8 @@ tidy:
 
 clean:  tidy
 	@$(CD) ./cpp; $(MAKE) wipe;
-	@$(CD) ./c; $(MAKE) wipe;
-	@$(CD) ./fortran; $(MAKE) wipe;
+#	@$(CD) ./c; $(MAKE) wipe;
+#	@$(CD) ./fortran; $(MAKE) wipe;
 	@$(RM) $(RMFLAGS) $(OBJS) *.o core *.out *.so *.dylib
 
 spotless: clean

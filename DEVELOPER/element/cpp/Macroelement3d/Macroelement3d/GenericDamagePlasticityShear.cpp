@@ -37,6 +37,7 @@ Last edit: 27 Feb 2019
 #include "OPS_Globals.h"
 #include "OPS_Stream.h"
 
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -47,6 +48,9 @@ Last edit: 27 Feb 2019
 #include <MapOfTaggedObjects.h>
 
 
+#ifndef DBL_EPSILON
+#define DBL_EPSILON (std::numeric_limits<double>::epsilon())
+#endif
 
 
 #ifdef _USRDLL
