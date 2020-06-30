@@ -31,36 +31,45 @@ submitted to Earthquake Engineering and Structural Dynamics (2019)
 Last edit: 27 Feb 2019
 */
 
-
+/* -------------------------------------------------------------------------- */
 #include "Macroelement3d.h"
-#include "NoTensionSection3d.h"
 #include "DamageShearInterface.h"
 #include "GambarottaLagomarsinoModel.h"
+#include "NoTensionSection3d.h"
 #include "GenericDamagePlasticityShear.h"
 #include "WrappedMaterial.h"
-
-#include <Node.h>
-#include <SectionForceDeformation.h>
-#include <Matrix.h>
-#include <Vector.h>
-#include <ID.h>
-#include <Renderer.h>
-#include <Domain.h>
-#include <string.h>
-#include <Information.h>
+/* -------------------------------------------------------------------------- */
 #include <Channel.h>
-#include <FEM_ObjectBroker.h>
+#include <CompositeResponse.h>
+#include <Domain.h>
 #include <ElementResponse.h>
 #include <ElementalLoad.h>
+#include <FEM_ObjectBroker.h>
+#include <ID.h>
+#include <Information.h>
+#include <Matrix.h>
+#include <Node.h>
 #include <Parameter.h>
-#include <math.h>
-#include <algorithm>
+#include <Renderer.h>
+#include <SectionForceDeformation.h>
+#include <TransientIntegrator.h>
+#include <Vector.h>
 #include <elementAPI.h>
+/* -------------------------------------------------------------------------- */
+#include <algorithm>
+#include <limits>
 #include <string>
+
+#include <cmath>
+/* -------------------------------------------------------------------------- */
+#ifndef DBL_EPSILON
+#define DBL_EPSILON (std::numeric_limits<double>::epsilon())
+#endif
 #include <TransientIntegrator.h>
 #include <CompositeResponse.h>
 #include <typeinfo>
 #include <string>
+
 
 
 Matrix Macroelement3d::K(18,18);
@@ -150,13 +159,13 @@ OPS_Macroelement3d()
     oop(1) = dData[4]; 
     oop(2) = dData[5]; 
 
-	SectionForceDeformation* theSectionI;
-    SectionForceDeformation* theSectionE;
-	SectionForceDeformation* theSectionJ;
+	SectionForceDeformation* theSectionI{nullptr};
+    SectionForceDeformation* theSectionE{nullptr};
+	SectionForceDeformation* theSectionJ{nullptr};
 
 
-    NDMaterial* theShearModel;
-	NDMaterial* theShearModelOOP;
+    NDMaterial* theShearModel{nullptr};
+	NDMaterial* theShearModelOOP{nullptr};
     double E_, h; 
 	
 	bool gable = false;
@@ -191,7 +200,7 @@ OPS_Macroelement3d()
 		double Gc = dData2[8];
 		double beta = dData2[9];
 
-		Ltfc = abs(fc*b*t);
+		Ltfc = std::abs(fc*b*t);
 		
 		// No tension 3d section model
 		// true for stronger, true for elastic, true for crushing
@@ -237,7 +246,7 @@ OPS_Macroelement3d()
 		double Gc = dData2[8];
 		double beta = dData2[9];
 
-		Ltfc = abs(fc*b*t);
+		Ltfc = std::abs(fc*b*t);
 
 		// true for stronger, true for elastic, true for crushing
 		double thinner = 100.;
@@ -313,7 +322,7 @@ OPS_Macroelement3d()
 		double Gc = dData2[8];
 		double beta = dData2[9];
 
-		Ltfc = abs(fc*b*t);
+		Ltfc = std::abs(fc*b*t);
 
 		// Gambarotta Lagomarsino model for shear
 		// true-false for elastic solution or not. The 5/6 factor is dropped to make it equivalent to Tremuri
@@ -429,7 +438,7 @@ OPS_Macroelement3d()
 		double dropDrift = dData2[9];
 		double muR = dData2[10];
 
-		Ltfc = abs(fc*b*t);
+		Ltfc = std::abs(fc*b*t);
 
 		// true for stronger, true for elastic, true for crushing
 		theSectionI = new NoTensionSection3d(0, E_, G, t, b, -1.0, fc, 11, false, false, true);   	
@@ -573,7 +582,7 @@ OPS_Macroelement3d()
 		double dropDrift = dData2[9];
 		double muR = dData2[10];
 
-		Ltfc = abs(fc*b*t);
+		Ltfc = std::abs(fc*b*t);
 
 		// true for stronger, true for elastic, true for crushing
 		theSectionI = new NoTensionSection3d(0, E_, G, t, b, -1.0, fc, 5, true, false, false);  	
@@ -720,7 +729,7 @@ OPS_Macroelement3d()
 		double dropDrift = dData2[9];
 		double muR = dData2[10];
 
-		Ltfc = abs(fc*0.5*b*t);
+		Ltfc = std::abs(fc*0.5*b*t);
 
 		// true for stronger, true for elastic, true for crushing
 		theSectionI = new NoTensionSection3d(0, E_, 0.5*G, t,     b, -1.0, fc, 11, false, false, true);   
@@ -1022,7 +1031,7 @@ OPS_Macroelement3d()
 					  // maybe check that they sum to 1
 					  double sum = 0.;
 					  sum = intLength(0) + intLength(1) + intLength(2);
-					  if (abs(sum-1.0) > 0.01)
+					  if (std::abs(sum-1.0) > 0.01)
 						  opserr << "WARNING: Macroelement " << iData[0] <<", specified integration weights do not sum exactly to 1 (sum=" << sum << ").\n";
 				  }
 			  }
@@ -1052,7 +1061,7 @@ OPS_Macroelement3d()
 
 			bool goOn = true;
 			int i=0;
-			int numData = 1;
+			//int numData = 1;
 			double singleInput;
 
 			const char* stringRead = NULL;
@@ -1120,7 +1129,7 @@ OPS_Macroelement3d()
 
 			bool goOn = true;
 			int i=0;
-			int numData = 1;
+			//		int numData = 1;
 			double singleInput;
 
 			const char* stringRead = NULL;
@@ -1197,32 +1206,41 @@ OPS_Macroelement3d()
 		 (strcmp(inputStructure,"-spandrel")==0) || 
 		 (strcmp(inputStructure,"-gable")==0) )  {
 
-	    if (theSectionI!=NULL)  delete [] theSectionI;
-	    if (theSectionE!=NULL)  delete [] theSectionE;
-	    if (theSectionJ!=NULL)  delete [] theSectionJ;
-	    if (theShearModel!=NULL)  delete [] theShearModel;
-	    if (theShearModelOOP!=NULL)  delete [] theShearModelOOP;
+	    if (theSectionI!=NULL)  delete theSectionI;
+	    if (theSectionE!=NULL)  delete theSectionE;
+	    if (theSectionJ!=NULL)  delete theSectionJ;
+	    if (theShearModel!=NULL)  delete theShearModel;
+	    if (theShearModelOOP!=NULL)  delete theShearModelOOP;
 	 }
 	 
      return theEle;
 }
 
-
-Macroelement3d::Macroelement3d(int tag, int nd1, int nd2, int ndE, 
-							   SectionForceDeformation *sI, SectionForceDeformation *sE, SectionForceDeformation *sJ, 
-							   NDMaterial* shearModel, NDMaterial* shearModelOOP, double h, double E_, 
-							   Vector driftF, Vector driftF_ALR, Vector driftS, Vector driftS_ALR, double Ltfc, double alphaAC_HC, double betaShearSpanF, double betaShearSpanS, double failureFactorF, double failureFactorS,
-							   Vector axis, Vector oop, Vector _intLength, Vector _intLengthMasses, Vector massDir, 
-							   int PDelta, double rho, int cm, double _isGable)
-   :Element (tag, 0),
-   numSections(3), numShearModels(2), theSections(0), theShearModel(0), connectedExternalNodes(3), Q(18), q(12), uBasic(12), uBasicCommitted(12), Tgl(18,18), GammaC(12,18), Tgl6(6,6), rho(rho), cMass(cm), 
-   parameterID(0), E(E_), intLength(_intLength), intLengthMasses(_intLengthMasses),  massglobalDir(massDir), driftF(0.), driftS(0.), 
-   limitDriftF(driftF), limitDriftS(driftS), limitDriftF_ALR(driftF_ALR), limitDriftS_ALR(driftS_ALR), Ltfc(Ltfc), alphaAC_HC(alphaAC_HC), betaShearSpanF(betaShearSpanF), betaShearSpanS(betaShearSpanS), failureFactorF(failureFactorF), failureFactorS(failureFactorS),
-   failedF(false), failedS(false), failedFcommitted(false), failedScommitted(false), 
-   collapsedF(false), collapsedS(false), collapsedFcommitted(false), collapsedScommitted(false), 
-   isGable(_isGable), wx(0.0), wy(0.0), wz(0.0), nodeIInitialDisp(0), nodeJInitialDisp(0), nodeIOffset(0), nodeJOffset(0), 
-   xAxis(3), yAxis(3), zAxis(3), L(h/2.0), PDelta(PDelta), deltaW1(0.), deltaV1(0.), deltaW3(0.), deltaV3(0.)
-{
+Macroelement3d::Macroelement3d(
+    int tag, int nd1, int nd2, int ndE, SectionForceDeformation *sI,
+    SectionForceDeformation *sE, SectionForceDeformation *sJ,
+    NDMaterial *shearModel, NDMaterial *shearModelOOP, double h, double E_,
+    Vector driftF, Vector driftF_ALR, Vector driftS, Vector driftS_ALR,
+    double Ltfc, double alphaAC_HC, double betaShearSpanF,
+    double betaShearSpanS, double failureFactorF, double failureFactorS,
+    Vector axis, Vector oop, Vector _intLength, Vector _intLengthMasses,
+    Vector massDir, int PDelta, double rho, int cm, double _isGable)
+    : Element(tag, 0), numSections(3), numShearModels(2), theSections(0),
+      theShearModel(0), connectedExternalNodes(3), GammaC(12, 18), Tgl(18, 18),
+      Tgl6(6, 6), Q(18), q(12), uBasic(12), uBasicCommitted(12), rho(rho),
+      cMass(cm), massglobalDir(massDir), PDelta(PDelta), deltaW1(0.),
+      deltaV1(0.), deltaW3(0.), deltaV3(0.), parameterID(0),
+      nodeIInitialDisp(0), nodeJInitialDisp(0), nodeIOffset(0), nodeJOffset(0),
+      xAxis(3), yAxis(3), zAxis(3), intLength(_intLength),
+      intLengthMasses(_intLengthMasses), L(h / 2.0), E(E_), driftF(0.),
+      driftS(0.), Ltfc(Ltfc), betaShearSpanF(betaShearSpanF),
+      betaShearSpanS(betaShearSpanS), limitDriftF(driftF), limitDriftS(driftS),
+      limitDriftF_ALR(driftF_ALR), limitDriftS_ALR(driftS_ALR),
+      alphaAC_HC(alphaAC_HC), failedF(false), failedS(false),
+      failedFcommitted(false), failedScommitted(false), collapsedF(false),
+      collapsedS(false), collapsedFcommitted(false), collapsedScommitted(false),
+      failureFactorF(failureFactorF), failureFactorS(failureFactorS),
+      isGable(_isGable), wx(0.0), wy(0.0), wz(0.0) {
 
   // Allocate arrays of pointers to SectionForceDeformations
   theSections = new SectionForceDeformation *[numSections];
@@ -1331,17 +1349,22 @@ Macroelement3d::Macroelement3d(int tag, int nd1, int nd2, int ndE,
 	this->intLength *= 2*L;
 	this->intLengthMasses *= 2*L;
 
-    
 }
 
 Macroelement3d::Macroelement3d()
-:Element (0, 0),
-          numSections(0), numShearModels(0), theSections(0), theShearModel(0),connectedExternalNodes(3), Q(18), q(12), uBasic(12), uBasicCommitted(12), Tgl(18,18), Tgl6(6,6), GammaC(12,18),
-		  rho(0.0), cMass(0), parameterID(0), E(0.), intLength(3), intLengthMasses(3), driftF(0.), driftS(0.), limitDriftF(0), limitDriftS(0), limitDriftF_ALR(0), limitDriftS_ALR(0), 
-		  alphaAC_HC(0.0), betaShearSpanF(0.0), betaShearSpanS(0.0), failureFactorF(0.0), failureFactorS(0.0), failedF(false), failedS(false), failedFcommitted(false), failedScommitted(false), 
-		  collapsedF(false), collapsedS(false), collapsedFcommitted(false), collapsedScommitted(false),
-		  nodeIInitialDisp(0), nodeJInitialDisp(0), nodeIOffset(0), nodeJOffset(0), xAxis(3), yAxis(3), zAxis(3), L(0.0), PDelta(0), deltaW1(0.), deltaV1(0.), deltaW3(0.), deltaV3(0.)
-{
+    : Element(0, 0), numSections(0), numShearModels(0), theSections(0),
+      theShearModel(0), connectedExternalNodes(3), Q(18), q(12), uBasic(12),
+      uBasicCommitted(12), Tgl(18, 18), Tgl6(6, 6), GammaC(12, 18), rho(0.0),
+      cMass(0), parameterID(0), E(0.), intLength(3), intLengthMasses(3),
+      driftF(0.), driftS(0.), limitDriftF(0), limitDriftS(0),
+      limitDriftF_ALR(0), limitDriftS_ALR(0), alphaAC_HC(0.0),
+      betaShearSpanF(0.0), betaShearSpanS(0.0), failureFactorF(0.0),
+      failureFactorS(0.0), failedF(false), failedS(false),
+      failedFcommitted(false), failedScommitted(false), collapsedF(false),
+      collapsedS(false), collapsedFcommitted(false), collapsedScommitted(false),
+      nodeIInitialDisp(0), nodeJInitialDisp(0), nodeIOffset(0), nodeJOffset(0),
+      xAxis(3), yAxis(3), zAxis(3), L(0.0), PDelta(0), deltaW1(0.), deltaV1(0.),
+      deltaW3(0.), deltaV3(0.) {
   for (int i=0; i<12; i++) {
 	  q0[i] = 0.0;
       p0[i] = 0.0;
@@ -1356,7 +1379,6 @@ Macroelement3d::Macroelement3d()
   theNodes[0] = 0;
   theNodes[1] = 0;
   theNodes[2] = 0;
-
 }
 
 Macroelement3d::~Macroelement3d()
@@ -1722,14 +1744,14 @@ Macroelement3d::update(void)
 
 
 	// check for in-plane drift failure
-	driftS = abs(-uBasic(10)) /2.0 *oneOverL;
-#ifdef _WINDOWS_
-   driftF = max(abs(-(uBasic(1)*(2 * L) + uBasic(5)*L) / (2.0*L)),
-                abs(-(uBasic(8)*(2 * L) + uBasic(5)*L) / (2.0*L)));
-#else
-	driftF = std::max(abs(-(uBasic(1)*(2 * L) + uBasic(5)*L) / (2.0*L)),
-		abs(-(uBasic(8)*(2 * L) + uBasic(5)*L) / (2.0*L)));
-#endif // _WINDOWS_
+	driftS = std::abs(-uBasic(10)) /2.0 *oneOverL;
+// #ifdef _WINDOWS_
+// 	driftF = std::max(std::abs(-(uBasic(1)*(2 * L) + uBasic(5)*L) / (2.0*L)),
+//                 std::abs(-(uBasic(8)*(2 * L) + uBasic(5)*L) / (2.0*L)));
+// #else
+	driftF = std::max(std::abs(-(uBasic(1)*(2 * L) + uBasic(5)*L) / (2.0*L)),
+		std::abs(-(uBasic(8)*(2 * L) + uBasic(5)*L) / (2.0*L)));
+//#endif // _WINDOWS_
 
 
 	double axialLoadRatio;
@@ -1739,18 +1761,18 @@ Macroelement3d::update(void)
 	    axialLoadRatio = 0.0;
 
 	double shearSpanRatio;
-	if (abs(M1 - M3) < DBL_EPSILON) {
+	if (std::abs(M1 - M3) < DBL_EPSILON) {
 		shearSpanRatio = 10.;
 	}
 	else {
 
-#ifdef _WINDOWS_
-		shearSpanRatio = max(M1 / (M1 - M3),
-			                 M3 / (M3 - M1));
-#else
+// #ifdef _WINDOWS_
+// 		shearSpanRatio = max(M1 / (M1 - M3),
+// 			                 M3 / (M3 - M1));
+// #else
 		shearSpanRatio = std::max(M1 / (M1 - M3),
 			                      M3 / (M3 - M1));
-#endif // _WINDOWS_
+//#endif // _WINDOWS_
 
 		if (shearSpanRatio > 10)
 			shearSpanRatio = 10.;
@@ -1805,7 +1827,7 @@ Macroelement3d::update(void)
 }
 
 void 
-Macroelement3d::driftModel(double currentDriftF, double currentDriftS, double axialLoadRatio, double H0overL) {
+Macroelement3d::driftModel(double /*currentDriftF*/, double /*currentDriftS*/, double axialLoadRatio, double H0overL) {
 
 	if (axialLoadRatio<DBL_EPSILON)  axialLoadRatio = 0.0;
 	if (axialLoadRatio>1.0)  axialLoadRatio = 0.999;
@@ -1826,13 +1848,13 @@ Macroelement3d::driftModel(double currentDriftF, double currentDriftS, double ax
 
 		double driftF_capacity = limitDriftF(index-1) + (limitDriftF(index)-limitDriftF(index-1)) / (limitDriftF_ALR(index)-limitDriftF_ALR(index-1)) 
 		                     * (axialLoadRatio - limitDriftF_ALR(index-1));
-		driftF_capacity *= pow(H0overL, betaShearSpanF);
+		driftF_capacity *= std::pow(H0overL, betaShearSpanF);
 	    
 		//check for loss of lateral force capacity
-		if (abs(driftF)>driftF_capacity)    failedF = true;
+		if (std::abs(driftF)>driftF_capacity)    failedF = true;
 
 		if (alphaAC_HC>0) {  // check for axial collapse
-			if (abs(driftF)>driftF_capacity*alphaAC_HC)    collapsedF = true;
+			if (std::abs(driftF)>driftF_capacity*alphaAC_HC)    collapsedF = true;
 		}
 
 
@@ -1853,13 +1875,13 @@ Macroelement3d::driftModel(double currentDriftF, double currentDriftS, double ax
 
 		double driftS_capacity = limitDriftS(index-1) + (limitDriftS(index)-limitDriftS(index-1)) / (limitDriftS_ALR(index)-limitDriftS_ALR(index-1)) 
 		                     * (axialLoadRatio - limitDriftS_ALR(index-1));
-		driftS_capacity *= pow(H0overL, betaShearSpanS);
+		driftS_capacity *= std::pow(H0overL, betaShearSpanS);
 	    
 		//check for loss of lateral force capacity
-		if (abs(driftS)>driftS_capacity)    failedS = true;
+		if (std::abs(driftS)>driftS_capacity)    failedS = true;
 
 		if (alphaAC_HC>0) {  // check for axial collapse
-			if (abs(driftS)>driftS_capacity*alphaAC_HC)    collapsedS = true;
+			if (std::abs(driftS)>driftS_capacity*alphaAC_HC)    collapsedS = true;
 		}
 	}
 
@@ -1965,14 +1987,14 @@ Macroelement3d::getBasicDisplacement(Vector dispI, Vector dispJ, Vector dispE) {
 	if (PDelta) {
 		// non-linear total compatibility relations: OpenSees does not incluide this
 		// first order approximationd of rotations, second order approximations of axial strain
-		updatedBasic(0)  =  uE(0) - uI(0)  + 0.5*oneOverL*(pow(dV1,2) + pow(dW1,2));
+		updatedBasic(0)  =  uE(0) - uI(0)  + 0.5*oneOverL*(std::pow(dV1,2) + std::pow(dW1,2));
 		updatedBasic(1)  = -uI(5)  + oneOverL*dV1 ;
 		updatedBasic(2)  = -uI(4)  - oneOverL*dW1;
 		updatedBasic(3)  =  uJ(3) - uI(3);
 		updatedBasic(4)  = -uE(0) + uE(3); // + 0.5*oneOverL*(-deltaV2*(uI(1)-uJ(1)) -deltaW2*(uI(2)-uJ(2)));  term to be included if exact formulation is applied
 		updatedBasic(5)  =  oneOverL*(-dV1 + dV3);
 		updatedBasic(6)  =  oneOverL*( dW1 - dW3);
-		updatedBasic(7)  =  uJ(0) - uE(3) + 0.5*oneOverL*(pow(dV3,2) + pow(dW3,2));
+		updatedBasic(7)  =  uJ(0) - uE(3) + 0.5*oneOverL*(std::pow(dV3,2) + std::pow(dW3,2));
 		updatedBasic(8)  =  uJ(5) - oneOverL*dV3;
 		updatedBasic(9)  =  uJ(4) + oneOverL*dW3;
 		updatedBasic(10) =  dV2;  // the terms for the exact formulation are not included as they need an update of deltaU also
@@ -2166,7 +2188,7 @@ Macroelement3d::getTangentStiff()
   for (int sect=0; sect<2; sect++) {
 
 	Matrix EshearModel = theShearModel[sect]->getInitialTangent();
-	double N = q(4);
+	//double N = q(4);
 	double Esm = EshearModel(0,0);
 
     const Matrix &ks = theShearModel[sect]->getTangent();
@@ -2239,7 +2261,7 @@ Macroelement3d::getTangentStiff()
 
 	    double qq0 = q(0);
 	    double qq7 = q(7);
-	    double qq4 = q(4);
+	    //double qq4 = q(4);
 
 	  	kgeom(1,1) = qq0*oneOverL;
 		kgeom(1,13) = -(qq0*oneOverL);
@@ -2276,7 +2298,7 @@ Macroelement3d::getInitialBasicStiff()
   static Matrix kb(12,12);  
   kb.Zero();
   
-  double oneOverL = 1.0/L;
+  //double oneOverL = 1.0/L;
 
   // first interface
   int order = theSections[0]->getOrder();
@@ -2575,9 +2597,9 @@ Macroelement3d::getMass()
 		 K(2, 3) = K(3, 2) =  nodeIOffset[1] * K(2, 2);
 		 K(2, 4) = K(4, 2) = -nodeIOffset[0] * K(2, 2);
 
-		 K(3, 3) = (pow(nodeIOffset[1], 2) + pow(nodeIOffset[2], 2))* K(0, 0);
-		 K(4, 4) = (pow(nodeIOffset[0], 2) + pow(nodeIOffset[2], 2))* K(1, 1);
-		 K(5, 5) = (pow(nodeIOffset[0], 2) + pow(nodeIOffset[1], 2))* K(2, 2);
+		 K(3, 3) = (std::pow(nodeIOffset[1], 2) + std::pow(nodeIOffset[2], 2))* K(0, 0);
+		 K(4, 4) = (std::pow(nodeIOffset[0], 2) + std::pow(nodeIOffset[2], 2))* K(1, 1);
+		 K(5, 5) = (std::pow(nodeIOffset[0], 2) + std::pow(nodeIOffset[1], 2))* K(2, 2);
 
 		 K(3, 4) = K(4, 3) = -nodeIOffset[0] * nodeIOffset[1] * K(2, 2);
 		 K(3, 5) = K(5, 3) = -nodeIOffset[0] * nodeIOffset[2] * K(1, 1);
@@ -2602,9 +2624,9 @@ Macroelement3d::getMass()
 		 K(8, 9)  = K(9,  8) =  nodeJOffset[1] * K(8, 8);
 		 K(8, 10) = K(10, 8) = -nodeJOffset[0] * K(8, 8);
 
-		 K(9,  9)  = (pow(nodeJOffset[1], 2) + pow(nodeJOffset[2], 2))* K(6, 6);
-		 K(10, 10) = (pow(nodeJOffset[0], 2) + pow(nodeJOffset[2], 2))* K(7, 7);
-		 K(11, 11) = (pow(nodeJOffset[0], 2) + pow(nodeJOffset[1], 2))* K(8, 8);
+		 K(9,  9)  = (std::pow(nodeJOffset[1], 2) + std::pow(nodeJOffset[2], 2))* K(6, 6);
+		 K(10, 10) = (std::pow(nodeJOffset[0], 2) + std::pow(nodeJOffset[2], 2))* K(7, 7);
+		 K(11, 11) = (std::pow(nodeJOffset[0], 2) + std::pow(nodeJOffset[1], 2))* K(8, 8);
 
 		 K(9,  10) = K(6,  9)  = -nodeJOffset[0] * nodeJOffset[1] * K(8, 8);
 		 K(9,  11) = K(11, 9)  = -nodeJOffset[0] * nodeJOffset[2] * K(7, 7);
@@ -2825,7 +2847,7 @@ Macroelement3d::getResistingForce()
   P.Zero();
   q.Zero();
   
-  double oneOverL = 1.0/L;
+  //double oneOverL = 1.0/L;
 
   // first interface
   int order, j;
@@ -3071,22 +3093,22 @@ Macroelement3d::getResistingForceIncInertia()
 }
 
 int
-Macroelement3d::sendSelf(int commitTag, Channel &theChannel)
+Macroelement3d::sendSelf(int /*commitTag*/, Channel &/*theChannel*/)
 {
 	opserr << "Macroelement3d::sendSelf: method not implemented\n";
 	return -1;
 }
 
 int
-Macroelement3d::recvSelf(int commitTag, Channel &theChannel,
-						FEM_ObjectBroker &theBroker)
+Macroelement3d::recvSelf(int /*commitTag*/, Channel &/*theChannel*/,
+						 FEM_ObjectBroker &/*theBroker*/)
 {
 	opserr << "Macroelement3d::recvSelf: method not implemented\n";
 	return -1;
 }
 
 void
-Macroelement3d::Print(OPS_Stream &s, int flag)
+Macroelement3d::Print(OPS_Stream &s, int /*flag*/)
 {
   s << "\nMacroelement3d, element id:  " << this->getTag() << endln;
   s << "\tConnected external nodes:  " << connectedExternalNodes;

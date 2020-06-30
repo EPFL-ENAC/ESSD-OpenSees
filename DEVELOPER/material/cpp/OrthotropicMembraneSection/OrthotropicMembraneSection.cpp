@@ -66,8 +66,7 @@ ID      OrthotropicMembraneSection::array(8) ;
 #define OPS_Export extern "C"
 #endif
 
-static int numOrthotropicMembrane = 0;
-
+static bool loadedOrthotropicMembrane{false};
 OPS_Export void *
 	OPS_OrthotropicMembraneSection()
 {
@@ -88,29 +87,9 @@ OPS_Export void *
 		}
 		
 	}
+  }
 
-    if (OPS_GetNumRemainingInputArgs() < 6) {
-		opserr << "WARNING insufficient arguments\n";
-		opserr << "Want: section OrthotropicMembraneSection tag? E1? E2? ni? G? h? <rho?>\n";
-	return 0;
-    }
-
-    int tag;
-    int numdata = 1;
-    if (OPS_GetIntInput(&numdata, &tag) < 0) {
-	opserr << "WARNING invalid tag\n";
-	return 0;
-    }
-
-    double data[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    numdata = OPS_GetNumRemainingInputArgs();
-    if (numdata > 6) numdata = 6;   // don't read too many arguments if input is wrong
-    if (OPS_GetDoubleInput(&numdata, data) < 0) {
-	opserr << "WARNING invalid double values\n";
-	return 0;
-    }
-
-    return new OrthotropicMembraneSection(tag, data[0], data[1], data[2], data[3], data[4], data[5]);
+  return new OrthotropicMembraneSection(tag, E1, E2, ni, G, h, rho);
 }
 
 //null constructor

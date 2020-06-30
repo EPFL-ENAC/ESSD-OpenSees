@@ -86,17 +86,20 @@
 #include <TubeSectionIntegration.h>
 
 //#include <McftSection2dfiber.h>
-
-// added by Francesco Vanin
-#include <OrthotropicMembraneSection.h>
-#include <NoTensionSection3d.h>
-
 #include <string.h>
 #include <fstream>
 using std::ifstream;
 
 #include <iostream>
 using std::ios;
+
+#include <packages.h>
+#include <elementAPI.h>
+
+
+// added by Francesco Vanin
+extern "C" void *OPS_OrthotropicMembraneSection();
+extern "C" void *OPS_NoTensionSection3d();
 
 int
 TclCommand_addFiberSection (ClientData clientData, Tcl_Interp *interp, int argc,
@@ -2019,7 +2022,23 @@ TclModelBuilderSectionCommand (ClientData clientData, Tcl_Interp *interp, int ar
       theSection = TclModelBuilderYS_SectionCommand(clientData, interp, argc, 
 						    argv, theTclBuilder);
     }
-    
+
+    //
+    // maybe section class exists in a package yet to be loaded
+    //
+	if (theSection == nullptr) {
+	    void *libHandle{nullptr};
+        void * (*funcPtr)();
+
+        auto tclFuncName =  "OPS_" + std::string(argv[1]);
+        int res = getLibraryFunction(argv[1], tclFuncName.c_str(),
+									 &libHandle, (void **)&funcPtr);
+		if (res == 0) {
+		    OPS_ResetCurrentInputArg(2);
+		    theSection = reinterpret_cast<SectionForceDeformation*>((*funcPtr)());
+		}
+    }
+
     // Ensure we have created the Material, out of memory if got here and no section
     if (theSection == 0) {
       opserr << "WARNING could not create section " << argv[1] << endln;
