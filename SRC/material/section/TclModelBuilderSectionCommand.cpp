@@ -98,8 +98,10 @@ using std::ios;
 
 
 // added by Francesco Vanin
-extern "C" void *OPS_OrthotropicMembraneSection();
-extern "C" void *OPS_NoTensionSection3d();
+//extern "C" void *OPS_OrthotropicMembraneSection();
+//extern "C" void *OPS_NoTensionSection3d();
+#include <OrthotropicMembraneSection.h>
+#include <NoTensionSection3d.h>
 
 int
 TclCommand_addFiberSection (ClientData clientData, Tcl_Interp *interp, int argc,

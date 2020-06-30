@@ -50,84 +50,10 @@ Last edit: 26 Feb 2019
 #define DBL_EPSILON (std::numeric_limits<double>::epsilon())
 #endif
 
-#ifdef _USRDLL
-#define OPS_Export extern "C" _declspec(dllexport)
-#elif _MACOSX
-#define OPS_Export extern "C" __attribute__((visibility("default")))
-#else
-#define OPS_Export extern "C"
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 
-
-
 ID NoTensionSection3d::code(4);
-
-static bool loadedNoTensionSection3d{false};
-
-OPS_Export void *OPS_NoTensionSection3d() {
-	 if (not loadedNoTensionSection3d) {
-		 loadedNoTensionSection3d = true;
-		 opserr<<"NoTensionSection3d - Written by Francesco Vanin, EPFL, 2018.\n";
-	 }
-	
-	 int argc = OPS_GetNumRemainingInputArgs();
-  	 if (argc < 7) {
-		opserr << "WARNING insufficient arguments\n";
-		opserr << "Want: section NoTensionSection3d $tag $E $G $L $t $J $fc <$numSlices>\n";
-		return nullptr;
-    }
-
-	int numdata = 1;
-    int tag;
-    double E,G,L,t,J,fc;
-    int numSlices = 5;
-  
-    if (OPS_GetIntInput(&numdata, &tag) != 0) {
-		opserr << "WARNING NoTensionSection3d: invalid tag" << endln;
-		return nullptr;
-    }
-  
-    if (OPS_GetDoubleInput(&numdata, &E) != 0) {
-		opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid Young's modulus\n";
-		return nullptr;
-    }
-  
-    if (OPS_GetDoubleInput(&numdata, &G) != 0) {
-		opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid shear modulus\n";
-		return nullptr;
-    }
-  
-    if (OPS_GetDoubleInput(&numdata, &L) != 0) {
-		opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid length (local direction y)\n";
-		return nullptr;
-    }
-  
-    if (OPS_GetDoubleInput(&numdata, &t) != 0) {
-		opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid thickness (local direction z)\n";
-		return nullptr;
-    }
-  
-    if (OPS_GetDoubleInput(&numdata, &J) != 0) {
-  	    opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid torsional stiffness\n";
-  	    return nullptr;
-    }
-  
-    if (OPS_GetDoubleInput(&numdata, &fc) != 0) {
-  	    opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid compressive strength\n";
-  	    fc = abs(fc);
-  	    return nullptr;
-    }
-  
-    if (argc > 7) {
-		if (OPS_GetIntInput(&numdata, &numSlices) != 0) {
-		    opserr << "WARNING NoTensionSection3d (tag " << tag << "): invalid number of section discretisations\n";
-      	    return nullptr;
-    	}
-    }
-}
 
 NoTensionSection3d::NoTensionSection3d(void) 
 	:SectionForceDeformation(0, 0), k(0.0), kg(0.0), t(0.0), L(0.0), J(0.0), fc(0.0), e(4), r(0), muMax(0), triangular(false),

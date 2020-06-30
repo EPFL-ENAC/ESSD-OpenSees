@@ -57,41 +57,6 @@ Matrix  OrthotropicMembraneSection::tangent(8,8) ;
 ID      OrthotropicMembraneSection::array(8) ;
 
 
-#ifdef _USRDLL
-#include <windows.h>
-#define OPS_Export extern "C" _declspec(dllexport)
-#elif _MACOSX
-#define OPS_Export extern "C" __attribute__((visibility("default")))
-#else
-#define OPS_Export extern "C"
-#endif
-
-static bool loadedOrthotropicMembrane{false};
-OPS_Export void *
-	OPS_OrthotropicMembraneSection()
-{
-	if (numOrthotropicMembrane==0) {
-		numOrthotropicMembrane += 1;
-		opserr<<"Orthotropic Membrane section - Written by Francesco Vanin, EPFL, 2018.\n";
-		//opserr << "Pointer : " << OPS_GetNumRemainingInputArgs() << endln;
-		double inputData[5];
-		int numdata = 5;
-
-		while (numdata == 5) {
-		}
-		
-		if (OPS_GetDoubleInput(&numdata, inputData) < 0) {
-			for (int k = 0; k < 5; k++)
-      			opserr << "input data " << k << ": " << inputData[k] << endln;
-			return 0;
-		}
-		
-	}
-  }
-
-  return new OrthotropicMembraneSection(tag, E1, E2, ni, G, h, rho);
-}
-
 //null constructor
 OrthotropicMembraneSection::OrthotropicMembraneSection( ) : SectionForceDeformation(0, 0), strain(8)  { 
 }
