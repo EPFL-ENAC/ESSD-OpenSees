@@ -1,0 +1,2 @@
+﻿  zeroLengthPlateBrick.cpp
+c:\users\vanin\documents\github\opensees\developer\element\cpp\zerolengthplatebrick\zerolengthplatebrick\zerolengthplatebrick\zerolengthplatebrick.cpp(31): fatal error C1083: Cannot open include file: 'ZeroLengthPlateBrick.h': No such file or directory

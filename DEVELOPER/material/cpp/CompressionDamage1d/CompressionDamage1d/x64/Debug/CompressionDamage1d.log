@@ -1,0 +1,135 @@
+﻿  CompressionDamage1d.cpp
+c:\users\vanin\documents\github\opensees\developer\material\cpp\compressiondamage1d\compressiondamage1d\compressiondamage1d.cpp(264): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  win32Functions.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  VertexIter.cpp
+  Vertex.cpp
+  Vector.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  UniaxialMaterial.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  TransientIntegrator.cpp
+  TaggedObject.cpp
+  SubdomainNodIter.cpp
+  Subdomain.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  StringContainer.cpp
+c:\users\vanin\documents\github\opensees\developer\core\stringcontainer.cpp(98): error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\string.h(136): note: see declaration of 'strcpy'
+  StaticIntegrator.cpp
+  StandardStream.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  SP_Constraint.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  SolutionAlgorithm.cpp
+  SingleDomSP_Iter.cpp
+  SingleDomPC_Iter.cpp
+  SingleDomParamIter.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  SingleDomNodIter.cpp
+  SingleDomMP_Iter.cpp
+  Generating Code...
+  Compiling...
+  SingleDomEleIter.cpp
+  SingleDomAllSP_Iter.cpp
+  SimulationInformation.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  SectionForceDeformation.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Response.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Renderer.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Recorder.cpp
+  Pressure_Constraint.cpp
+  PlateFiberMaterial.cpp
+  PlaneStressMaterial.cpp
+  PlaneStrainMaterial.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Parameter.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  OPS_Stream.cpp
+  ObjectBroker.cpp
+  Node.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  NodalLoadIter.cpp
+  NodalLoad.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  NDMaterial.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  MP_Constraint.cpp
+  MovableObject.cpp
+  Generating Code...
+  Compiling...
+  Message.cpp
+  MatrixUtil.cpp
+  Matrix.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  MaterialResponse.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Material.cpp
+  MapOfTaggedObjectsIter.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  MapOfTaggedObjects.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  LoadPatternIter.cpp
+  Load.cpp
+  LinearSOESolver.cpp
+  LinearSOE.cpp
+  Integrator.cpp
+  Information.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  IncrementalIntegrator.cpp
+  ID.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Graph.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  FrictionResponse.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  FrictionModel.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  FileIter.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  File.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Generating Code...
+  Compiling...
+  FiberResponse.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  FE_Element.cpp
+  FE_EleIter.cpp
+  FE_Datastore.cpp
+  FEM_ObjectBroker.cpp
+  ElementResponse.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  ElementalLoadIter.cpp
+  ElementalLoad.cpp
+  Element.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  EigenSolver.cpp
+  EigenSOE.cpp
+  DummyStream.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  DomainComponent.cpp
+  Domain.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  DOF_GrpIter.cpp
+  DOF_Group.cpp
+  DataFileStream.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  ConstraintHandler.cpp
+  CompositeResponse.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Channel.cpp
+  Generating Code...
+  Compiling...
+  BinaryFileStream.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  BeamFiberMaterial2d.cpp
+  BeamFiberMaterial.cpp
+  ArrayOfTaggedObjectsIter.cpp
+  ArrayOfTaggedObjects.cpp
+  AnalysisModel.cpp
+c:\program files (x86)\intelswtools\compilers_and_libraries_2019.2.190\windows\compiler\include\stdint.h(39): fatal error C1083: Cannot open include file: '../../vc/include/stdint.h': No such file or directory
+  Analysis.cpp
+  Generating Code...

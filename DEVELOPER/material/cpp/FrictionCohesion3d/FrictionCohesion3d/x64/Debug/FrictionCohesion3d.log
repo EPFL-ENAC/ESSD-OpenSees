@@ -1,0 +1,4 @@
+﻿  FrictionCohesion3d.cpp
+c:\users\vanin\documents\github\opensees\developer\material\cpp\frictioncohesion3d\frictioncohesion3d\frictioncohesion3d.cpp(127): warning C4715: 'OPS_FrictionCohesion3d': not all control paths return a value
+  FrictionCohesion3d.vcxproj -> C:\Users\vanin\Documents\GitHub\OpenSees\DEVELOPER\material\cpp\FrictionCohesion3d\x64\Debug\FrictionCohesion3d.dll
+          1 file(s) copied.

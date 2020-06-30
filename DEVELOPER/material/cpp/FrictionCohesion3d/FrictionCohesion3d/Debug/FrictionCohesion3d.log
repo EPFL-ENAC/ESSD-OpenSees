@@ -1,0 +1,189 @@
+﻿  FrictionCohesion3d.cpp
+c:\users\vanin\documents\github\opensees\developer\material\cpp\frictioncohesion3d\frictioncohesion3d\frictioncohesion3d.cpp(54): warning C4005: 'OPS_Export': macro redefinition
+  c:\users\vanin\documents\github\opensees\developer\material\cpp\frictioncohesion3d\frictioncohesion3d\frictioncohesion3d.cpp(52): note: see previous definition of 'OPS_Export'
+c:\users\vanin\documents\github\opensees\developer\material\cpp\frictioncohesion3d\frictioncohesion3d\frictioncohesion3d.cpp(56): warning C4005: 'OPS_Export': macro redefinition
+  c:\users\vanin\documents\github\opensees\developer\material\cpp\frictioncohesion3d\frictioncohesion3d\frictioncohesion3d.cpp(54): note: see previous definition of 'OPS_Export'
+c:\users\vanin\documents\github\opensees\developer\material\cpp\frictioncohesion3d\frictioncohesion3d\frictioncohesion3d.cpp(364): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  win32Functions.cpp
+c:\users\vanin\documents\github\opensees\developer\core\win32functions.cpp(402): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  VertexIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\vertexiter.cpp(78): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Vertex.cpp
+c:\users\vanin\documents\github\opensees\developer\core\vertex.cpp(221): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Vector.cpp
+c:\users\vanin\documents\github\opensees\developer\core\vector.cpp(1207): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  UniaxialMaterial.cpp
+c:\users\vanin\documents\github\opensees\developer\core\uniaxialmaterial.cpp(430): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  TransientIntegrator.cpp
+c:\users\vanin\documents\github\opensees\developer\core\transientintegrator.cpp(173): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  TaggedObject.cpp
+c:\users\vanin\documents\github\opensees\developer\core\taggedobject.cpp(62): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SubdomainNodIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\subdomainnoditer.cpp(91): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Subdomain.cpp
+c:\users\vanin\documents\github\opensees\developer\core\subdomain.cpp(955): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  StringContainer.cpp
+c:\users\vanin\documents\github\opensees\developer\core\stringcontainer.cpp(114): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  StaticIntegrator.cpp
+c:\users\vanin\documents\github\opensees\developer\core\staticintegrator.cpp(128): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  StandardStream.cpp
+c:\users\vanin\documents\github\opensees\developer\core\standardstream.cpp(431): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SP_Constraint.cpp
+c:\users\vanin\documents\github\opensees\developer\core\sp_constraint.cpp(422): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SolutionAlgorithm.cpp
+c:\users\vanin\documents\github\opensees\developer\core\solutionalgorithm.cpp(86): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SingleDomSP_Iter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledomsp_iter.cpp(83): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SingleDomPC_Iter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledompc_iter.cpp(83): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SingleDomParamIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledomparamiter.cpp(72): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SingleDomNodIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledomnoditer.cpp(80): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SingleDomMP_Iter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledommp_iter.cpp(84): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Generating Code...
+  Compiling...
+  SingleDomEleIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledomeleiter.cpp(79): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SingleDomAllSP_Iter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\singledomallsp_iter.cpp(104): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SimulationInformation.cpp
+c:\users\vanin\documents\github\opensees\developer\core\simulationinformation.cpp(753): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  SectionForceDeformation.cpp
+c:\users\vanin\documents\github\opensees\developer\core\sectionforcedeformation.cpp(495): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Response.cpp
+c:\users\vanin\documents\github\opensees\developer\core\response.cpp(96): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Renderer.cpp
+c:\users\vanin\documents\github\opensees\developer\core\renderer.cpp(243): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Recorder.cpp
+c:\users\vanin\documents\github\opensees\developer\core\recorder.cpp(88): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Pressure_Constraint.cpp
+c:\users\vanin\documents\github\opensees\developer\core\pressure_constraint.cpp(329): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  PlateFiberMaterial.cpp
+c:\users\vanin\documents\github\opensees\developer\core\platefibermaterial.cpp(558): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  PlaneStressMaterial.cpp
+c:\users\vanin\documents\github\opensees\developer\core\planestressmaterial.cpp(628): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  PlaneStrainMaterial.cpp
+c:\users\vanin\documents\github\opensees\developer\core\planestrainmaterial.cpp(366): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Parameter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\parameter.cpp(294): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  OPS_Stream.cpp
+c:\users\vanin\documents\github\opensees\developer\core\ops_stream.cpp(119): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ObjectBroker.cpp
+c:\users\vanin\documents\github\opensees\developer\core\objectbroker.cpp(50): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Node.cpp
+c:\users\vanin\documents\github\opensees\developer\core\node.cpp(2413): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  NodalLoadIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\nodalloaditer.cpp(77): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  NodalLoad.cpp
+c:\users\vanin\documents\github\opensees\developer\core\nodalload.cpp(342): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  NDMaterial.cpp
+c:\users\vanin\documents\github\opensees\developer\core\ndmaterial.cpp(378): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  MP_Constraint.cpp
+c:\users\vanin\documents\github\opensees\developer\core\mp_constraint.cpp(471): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  MovableObject.cpp
+c:\users\vanin\documents\github\opensees\developer\core\movableobject.cpp(114): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Generating Code...
+  Compiling...
+  Message.cpp
+c:\users\vanin\documents\github\opensees\developer\core\message.cpp(106): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  MatrixUtil.cpp
+c:\users\vanin\documents\github\opensees\developer\core\matrixutil.cpp(167): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Matrix.cpp
+c:\users\vanin\documents\github\opensees\developer\core\matrix.cpp(47): warning C4005: '_DLL': macro redefinition
+  c:\users\vanin\documents\github\opensees\developer\core\matrix.cpp(47): note: command-line arguments:  see previous definition of '_DLL'
+c:\users\vanin\documents\github\opensees\developer\core\matrix.cpp(1993): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  MaterialResponse.cpp
+c:\users\vanin\documents\github\opensees\developer\core\materialresponse.cpp(85): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Material.cpp
+c:\users\vanin\documents\github\opensees\developer\core\material.cpp(68): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  MapOfTaggedObjectsIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\mapoftaggedobjectsiter.cpp(74): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  MapOfTaggedObjects.cpp
+c:\users\vanin\documents\github\opensees\developer\core\mapoftaggedobjects.cpp(211): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  LoadPatternIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\loadpatterniter.cpp(77): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Load.cpp
+c:\users\vanin\documents\github\opensees\developer\core\load.cpp(63): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  LinearSOESolver.cpp
+c:\users\vanin\documents\github\opensees\developer\core\linearsoesolver.cpp(54): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  LinearSOE.cpp
+c:\users\vanin\documents\github\opensees\developer\core\linearsoe.cpp(111): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Integrator.cpp
+c:\users\vanin\documents\github\opensees\developer\core\integrator.cpp(132): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Information.cpp
+c:\users\vanin\documents\github\opensees\developer\core\information.cpp(267): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  IncrementalIntegrator.cpp
+c:\users\vanin\documents\github\opensees\developer\core\incrementalintegrator.cpp(656): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ID.cpp
+c:\users\vanin\documents\github\opensees\developer\core\id.cpp(645): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Graph.cpp
+c:\users\vanin\documents\github\opensees\developer\core\graph.cpp(490): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FrictionResponse.cpp
+c:\users\vanin\documents\github\opensees\developer\core\frictionresponse.cpp(87): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FrictionModel.cpp
+c:\users\vanin\documents\github\opensees\developer\core\frictionmodel.cpp(153): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FileIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\fileiter.cpp(58): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  File.cpp
+c:\users\vanin\documents\github\opensees\developer\core\file.cpp(274): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Generating Code...
+  Compiling...
+  FiberResponse.cpp
+c:\users\vanin\documents\github\opensees\developer\core\fiberresponse.cpp(80): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FE_Element.cpp
+c:\users\vanin\documents\github\opensees\developer\core\fe_element.cpp(1113): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FE_EleIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\fe_eleiter.cpp(73): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FE_Datastore.cpp
+c:\users\vanin\documents\github\opensees\developer\core\fe_datastore.cpp(194): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FEM_ObjectBroker.cpp
+c:\users\vanin\documents\github\opensees\developer\core\fem_objectbroker.cpp(374): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ElementResponse.cpp
+c:\users\vanin\documents\github\opensees\developer\core\elementresponse.cpp(91): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ElementalLoadIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\elementalloaditer.cpp(77): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ElementalLoad.cpp
+c:\users\vanin\documents\github\opensees\developer\core\elementalload.cpp(110): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Element.cpp
+c:\users\vanin\documents\github\opensees\developer\core\element.cpp(773): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  EigenSolver.cpp
+c:\users\vanin\documents\github\opensees\developer\core\eigensolver.cpp(34): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  EigenSOE.cpp
+c:\users\vanin\documents\github\opensees\developer\core\eigensoe.cpp(80): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  DummyStream.cpp
+c:\users\vanin\documents\github\opensees\developer\core\dummystream.cpp(42): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  DomainComponent.cpp
+c:\users\vanin\documents\github\opensees\developer\core\domaincomponent.cpp(72): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Domain.cpp
+c:\users\vanin\documents\github\opensees\developer\core\domain.cpp(3496): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  DOF_GrpIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\dof_grpiter.cpp(79): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  DOF_Group.cpp
+c:\users\vanin\documents\github\opensees\developer\core\dof_group.cpp(1013): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  DataFileStream.cpp
+c:\users\vanin\documents\github\opensees\developer\core\datafilestream.cpp(849): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ConstraintHandler.cpp
+c:\users\vanin\documents\github\opensees\developer\core\constrainthandler.cpp(107): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  CompositeResponse.cpp
+c:\users\vanin\documents\github\opensees\developer\core\compositeresponse.cpp(171): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Channel.cpp
+c:\users\vanin\documents\github\opensees\developer\core\channel.cpp(70): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Generating Code...
+  Compiling...
+  BinaryFileStream.cpp
+c:\users\vanin\documents\github\opensees\developer\core\binaryfilestream.cpp(883): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  BeamFiberMaterial2d.cpp
+c:\users\vanin\documents\github\opensees\developer\core\beamfibermaterial2d.cpp(556): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  BeamFiberMaterial.cpp
+c:\users\vanin\documents\github\opensees\developer\core\beamfibermaterial.cpp(503): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ArrayOfTaggedObjectsIter.cpp
+c:\users\vanin\documents\github\opensees\developer\core\arrayoftaggedobjectsiter.cpp(87): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  ArrayOfTaggedObjects.cpp
+c:\users\vanin\documents\github\opensees\developer\core\arrayoftaggedobjects.cpp(383): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  AnalysisModel.cpp
+c:\users\vanin\documents\github\opensees\developer\core\analysismodel.cpp(750): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Analysis.cpp
+c:\users\vanin\documents\github\opensees\developer\core\analysis.cpp(59): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Generating Code...

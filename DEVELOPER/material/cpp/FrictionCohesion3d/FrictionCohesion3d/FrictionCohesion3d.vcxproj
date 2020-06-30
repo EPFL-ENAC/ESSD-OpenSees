@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{38D1D0BE-1C45-49C6-9987-DDF9C1FCF07B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FrictionCohesion3d</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;FRICTIONCOHESION3D_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;FRICTIONCOHESION3D_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\vanin\Documents\GitHub\OpenSees\DEVELOPER\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-D__MS_VC_INSTALL_PATH="c:/Program files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.11.25503" %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Users\vanin\Documents\GitHub\OpenSees\Win64\bin\$(ProjectName).dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;FRICTIONCOHESION3D_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;FRICTIONCOHESION3D_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\vanin\Documents\GitHub\OpenSees\DEVELOPER\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-D__MS_VC_INSTALL_PATH="c:/Program files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.11.25503" %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\core\Analysis.h" />
+    <ClInclude Include="..\..\..\..\core\AnalysisModel.h" />
+    <ClInclude Include="..\..\..\..\core\ArrayOfTaggedObjects.h" />
+    <ClInclude Include="..\..\..\..\core\ArrayOfTaggedObjectsIter.h" />
+    <ClInclude Include="..\..\..\..\core\BeamFiberMaterial.h" />
+    <ClInclude Include="..\..\..\..\core\BeamFiberMaterial2d.h" />
+    <ClInclude Include="..\..\..\..\core\BinaryFileStream.h" />
+    <ClInclude Include="..\..\..\..\core\bool.h" />
+    <ClInclude Include="..\..\..\..\core\Channel.h" />
+    <ClInclude Include="..\..\..\..\core\classTags.h" />
+    <ClInclude Include="..\..\..\..\core\ColorMap.h" />
+    <ClInclude Include="..\..\..\..\core\CompositeResponse.h" />
+    <ClInclude Include="..\..\..\..\core\ConstraintHandler.h" />
+    <ClInclude Include="..\..\..\..\core\CrdTransf.h" />
+    <ClInclude Include="..\..\..\..\core\DataFileStream.h" />
+    <ClInclude Include="..\..\..\..\core\DOF_Group.h" />
+    <ClInclude Include="..\..\..\..\core\DOF_GrpIter.h" />
+    <ClInclude Include="..\..\..\..\core\Domain.h" />
+    <ClInclude Include="..\..\..\..\core\DomainComponent.h" />
+    <ClInclude Include="..\..\..\..\core\DomainDecompositionAnalysis.h" />
+    <ClInclude Include="..\..\..\..\core\DummyStream.h" />
+    <ClInclude Include="..\..\..\..\core\EigenSOE.h" />
+    <ClInclude Include="..\..\..\..\core\EigenSolver.h" />
+    <ClInclude Include="..\..\..\..\core\Element.h" />
+    <ClInclude Include="..\..\..\..\core\ElementalLoad.h" />
+    <ClInclude Include="..\..\..\..\core\ElementalLoadIter.h" />
+    <ClInclude Include="..\..\..\..\core\elementAPI.h" />
+    <ClInclude Include="..\..\..\..\core\ElementIter.h" />
+    <ClInclude Include="..\..\..\..\core\ElementResponse.h" />
+    <ClInclude Include="..\..\..\..\core\EquiSolnAlgo.h" />
+    <ClInclude Include="..\..\..\..\core\FEM_ObjectBroker.h" />
+    <ClInclude Include="..\..\..\..\core\FE_Datastore.h" />
+    <ClInclude Include="..\..\..\..\core\FE_EleIter.h" />
+    <ClInclude Include="..\..\..\..\core\FE_Element.h" />
+    <ClInclude Include="..\..\..\..\core\Fiber.h" />
+    <ClInclude Include="..\..\..\..\core\FiberResponse.h" />
+    <ClInclude Include="..\..\..\..\core\File.h" />
+    <ClInclude Include="..\..\..\..\core\FileIter.h" />
+    <ClInclude Include="..\..\..\..\core\FrictionModel.h" />
+    <ClInclude Include="..\..\..\..\core\FrictionResponse.h" />
+    <ClInclude Include="..\..\..\..\core\G3Globals.h" />
+    <ClInclude Include="..\..\..\..\core\Graph.h" />
+    <ClInclude Include="..\..\..\..\core\ID.h" />
+    <ClInclude Include="..\..\..\..\core\IncrementalIntegrator.h" />
+    <ClInclude Include="..\..\..\..\core\Information.h" />
+    <ClInclude Include="..\..\..\..\core\Integrator.h" />
+    <ClInclude Include="..\..\..\..\core\LinearSOE.h" />
+    <ClInclude Include="..\..\..\..\core\LinearSOESolver.h" />
+    <ClInclude Include="..\..\..\..\core\Load.h" />
+    <ClInclude Include="..\..\..\..\core\LoadPattern.h" />
+    <ClInclude Include="..\..\..\..\core\LoadPatternIter.h" />
+    <ClInclude Include="..\..\..\..\core\MapOfTaggedObjects.h" />
+    <ClInclude Include="..\..\..\..\core\MapOfTaggedObjectsIter.h" />
+    <ClInclude Include="..\..\..\..\core\Material.h" />
+    <ClInclude Include="..\..\..\..\core\MaterialResponse.h" />
+    <ClInclude Include="..\..\..\..\core\Matrix.h" />
+    <ClInclude Include="..\..\..\..\core\MatrixUtil.h" />
+    <ClInclude Include="..\..\..\..\core\MeshRegion.h" />
+    <ClInclude Include="..\..\..\..\core\Message.h" />
+    <ClInclude Include="..\..\..\..\core\MovableObject.h" />
+    <ClInclude Include="..\..\..\..\core\MP_Constraint.h" />
+    <ClInclude Include="..\..\..\..\core\MP_ConstraintIter.h" />
+    <ClInclude Include="..\..\..\..\core\NDMaterial.h" />
+    <ClInclude Include="..\..\..\..\core\NodalLoad.h" />
+    <ClInclude Include="..\..\..\..\core\NodalLoadIter.h" />
+    <ClInclude Include="..\..\..\..\core\Node.h" />
+    <ClInclude Include="..\..\..\..\core\NodeIter.h" />
+    <ClInclude Include="..\..\..\..\core\ObjectBroker.h" />
+    <ClInclude Include="..\..\..\..\core\OPS_Globals.h" />
+    <ClInclude Include="..\..\..\..\core\OPS_Stream.h" />
+    <ClInclude Include="..\..\..\..\core\Parameter.h" />
+    <ClInclude Include="..\..\..\..\core\ParameterIter.h" />
+    <ClInclude Include="..\..\..\..\core\PlainMap.h" />
+    <ClInclude Include="..\..\..\..\core\PlaneStrainMaterial.h" />
+    <ClInclude Include="..\..\..\..\core\PlaneStressMaterial.h" />
+    <ClInclude Include="..\..\..\..\core\PlateFiberMaterial.h" />
+    <ClInclude Include="..\..\..\..\core\Pressure_Constraint.h" />
+    <ClInclude Include="..\..\..\..\core\Pressure_ConstraintIter.h" />
+    <ClInclude Include="..\..\..\..\core\Recorder.h" />
+    <ClInclude Include="..\..\..\..\core\Renderer.h" />
+    <ClInclude Include="..\..\..\..\core\Response.h" />
+    <ClInclude Include="..\..\..\..\core\SectionForceDeformation.h" />
+    <ClInclude Include="..\..\..\..\core\SimulationInformation.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomAllSP_Iter.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomEleIter.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomMP_Iter.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomNodIter.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomParamIter.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomPC_Iter.h" />
+    <ClInclude Include="..\..\..\..\core\SingleDomSP_Iter.h" />
+    <ClInclude Include="..\..\..\..\core\SolutionAlgorithm.h" />
+    <ClInclude Include="..\..\..\..\core\SP_Constraint.h" />
+    <ClInclude Include="..\..\..\..\core\SP_ConstraintIter.h" />
+    <ClInclude Include="..\..\..\..\core\StandardStream.h" />
+    <ClInclude Include="..\..\..\..\core\StaticIntegrator.h" />
+    <ClInclude Include="..\..\..\..\core\StringContainer.h" />
+    <ClInclude Include="..\..\..\..\core\Subdomain.h" />
+    <ClInclude Include="..\..\..\..\core\SubdomainNodIter.h" />
+    <ClInclude Include="..\..\..\..\core\TaggedObject.h" />
+    <ClInclude Include="..\..\..\..\core\TaggedObjectIter.h" />
+    <ClInclude Include="..\..\..\..\core\TaggedObjectStorage.h" />
+    <ClInclude Include="..\..\..\..\core\TransientIntegrator.h" />
+    <ClInclude Include="..\..\..\..\core\UniaxialMaterial.h" />
+    <ClInclude Include="..\..\..\..\core\Vector.h" />
+    <ClInclude Include="..\..\..\..\core\Vertex.h" />
+    <ClInclude Include="..\..\..\..\core\VertexIter.h" />
+    <ClInclude Include="FrictionCohesion3d.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\core\Analysis.cpp" />
+    <ClCompile Include="..\..\..\..\core\AnalysisModel.cpp" />
+    <ClCompile Include="..\..\..\..\core\ArrayOfTaggedObjects.cpp" />
+    <ClCompile Include="..\..\..\..\core\ArrayOfTaggedObjectsIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\BeamFiberMaterial.cpp" />
+    <ClCompile Include="..\..\..\..\core\BeamFiberMaterial2d.cpp" />
+    <ClCompile Include="..\..\..\..\core\BinaryFileStream.cpp" />
+    <ClCompile Include="..\..\..\..\core\Channel.cpp" />
+    <ClCompile Include="..\..\..\..\core\CompositeResponse.cpp" />
+    <ClCompile Include="..\..\..\..\core\ConstraintHandler.cpp" />
+    <ClCompile Include="..\..\..\..\core\DataFileStream.cpp" />
+    <ClCompile Include="..\..\..\..\core\DOF_Group.cpp" />
+    <ClCompile Include="..\..\..\..\core\DOF_GrpIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\Domain.cpp" />
+    <ClCompile Include="..\..\..\..\core\DomainComponent.cpp" />
+    <ClCompile Include="..\..\..\..\core\DummyStream.cpp" />
+    <ClCompile Include="..\..\..\..\core\EigenSOE.cpp" />
+    <ClCompile Include="..\..\..\..\core\EigenSolver.cpp" />
+    <ClCompile Include="..\..\..\..\core\Element.cpp" />
+    <ClCompile Include="..\..\..\..\core\ElementalLoad.cpp" />
+    <ClCompile Include="..\..\..\..\core\ElementalLoadIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\ElementResponse.cpp" />
+    <ClCompile Include="..\..\..\..\core\FEM_ObjectBroker.cpp" />
+    <ClCompile Include="..\..\..\..\core\FE_Datastore.cpp" />
+    <ClCompile Include="..\..\..\..\core\FE_EleIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\FE_Element.cpp" />
+    <ClCompile Include="..\..\..\..\core\FiberResponse.cpp" />
+    <ClCompile Include="..\..\..\..\core\File.cpp" />
+    <ClCompile Include="..\..\..\..\core\FileIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\FrictionModel.cpp" />
+    <ClCompile Include="..\..\..\..\core\FrictionResponse.cpp" />
+    <ClCompile Include="..\..\..\..\core\Graph.cpp" />
+    <ClCompile Include="..\..\..\..\core\ID.cpp" />
+    <ClCompile Include="..\..\..\..\core\IncrementalIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\core\Information.cpp" />
+    <ClCompile Include="..\..\..\..\core\Integrator.cpp" />
+    <ClCompile Include="..\..\..\..\core\LinearSOE.cpp" />
+    <ClCompile Include="..\..\..\..\core\LinearSOESolver.cpp" />
+    <ClCompile Include="..\..\..\..\core\Load.cpp" />
+    <ClCompile Include="..\..\..\..\core\LoadPatternIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\MapOfTaggedObjects.cpp" />
+    <ClCompile Include="..\..\..\..\core\MapOfTaggedObjectsIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\Material.cpp" />
+    <ClCompile Include="..\..\..\..\core\MaterialResponse.cpp" />
+    <ClCompile Include="..\..\..\..\core\Matrix.cpp" />
+    <ClCompile Include="..\..\..\..\core\MatrixUtil.cpp" />
+    <ClCompile Include="..\..\..\..\core\Message.cpp" />
+    <ClCompile Include="..\..\..\..\core\MovableObject.cpp" />
+    <ClCompile Include="..\..\..\..\core\MP_Constraint.cpp" />
+    <ClCompile Include="..\..\..\..\core\NDMaterial.cpp" />
+    <ClCompile Include="..\..\..\..\core\NodalLoad.cpp" />
+    <ClCompile Include="..\..\..\..\core\NodalLoadIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\Node.cpp" />
+    <ClCompile Include="..\..\..\..\core\ObjectBroker.cpp" />
+    <ClCompile Include="..\..\..\..\core\OPS_Stream.cpp" />
+    <ClCompile Include="..\..\..\..\core\Parameter.cpp" />
+    <ClCompile Include="..\..\..\..\core\PlaneStrainMaterial.cpp" />
+    <ClCompile Include="..\..\..\..\core\PlaneStressMaterial.cpp" />
+    <ClCompile Include="..\..\..\..\core\PlateFiberMaterial.cpp" />
+    <ClCompile Include="..\..\..\..\core\Pressure_Constraint.cpp" />
+    <ClCompile Include="..\..\..\..\core\Recorder.cpp" />
+    <ClCompile Include="..\..\..\..\core\Renderer.cpp" />
+    <ClCompile Include="..\..\..\..\core\Response.cpp" />
+    <ClCompile Include="..\..\..\..\core\SectionForceDeformation.cpp" />
+    <ClCompile Include="..\..\..\..\core\SimulationInformation.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomAllSP_Iter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomEleIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomMP_Iter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomNodIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomParamIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomPC_Iter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SingleDomSP_Iter.cpp" />
+    <ClCompile Include="..\..\..\..\core\SolutionAlgorithm.cpp" />
+    <ClCompile Include="..\..\..\..\core\SP_Constraint.cpp" />
+    <ClCompile Include="..\..\..\..\core\StandardStream.cpp" />
+    <ClCompile Include="..\..\..\..\core\StaticIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\core\StringContainer.cpp" />
+    <ClCompile Include="..\..\..\..\core\Subdomain.cpp" />
+    <ClCompile Include="..\..\..\..\core\SubdomainNodIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\TaggedObject.cpp" />
+    <ClCompile Include="..\..\..\..\core\TransientIntegrator.cpp" />
+    <ClCompile Include="..\..\..\..\core\UniaxialMaterial.cpp" />
+    <ClCompile Include="..\..\..\..\core\Vector.cpp" />
+    <ClCompile Include="..\..\..\..\core\Vertex.cpp" />
+    <ClCompile Include="..\..\..\..\core\VertexIter.cpp" />
+    <ClCompile Include="..\..\..\..\core\win32Functions.cpp" />
+    <ClCompile Include="FrictionCohesion3d.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
