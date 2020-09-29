@@ -1658,12 +1658,13 @@ Macroelement3d::update(void)
   
     // Set section deformations
 	// divide by integration length
-    Vector e(4);
+    
 
 	// get ordering of sectional outputs (standard: P, Mz, My, T; a different ordering though can be implemented for some section models)
 	// assume that different section models with different orderings can be applied to the three sections
 	int order = theSections[0]->getOrder();
 	const ID &code0 = theSections[0]->getType();
+	Vector e(order);  // allow for longer vectors if the section order is higher (section aggregator, sections with shear deformations)
 
 	int ordering[4];
 	int j;
@@ -1690,6 +1691,7 @@ Macroelement3d::update(void)
 
 	err += theSections[0]->setTrialSectionDeformation(e);
 
+
 	M1 = (theSections[0]->getStressResultant())(ordering[1]);
 
 
@@ -1709,6 +1711,7 @@ Macroelement3d::update(void)
 		}
 	}
 
+	e.resize(order); // different section orders might be used (unlikely..)
     e.Zero();
     for (int i=0; i<3; i++)
 		if (ordering[i]>=0)
@@ -1731,12 +1734,12 @@ Macroelement3d::update(void)
 		}
 	}
 
+	e.resize(order); // different section orders might be used (unlikely..)
     e.Zero();
     for (int i=0; i<3; i++)
 		if (ordering[i]>=0)
 			e( ordering[i] ) = uBasic(i+7)   / intLength(2);
     err += theSections[2]->setTrialSectionDeformation(e);
-	
 	M3 = (theSections[2]->getStressResultant())(ordering[1]);
    
 	Vector N(4);
@@ -1817,6 +1820,7 @@ Macroelement3d::update(void)
 
 	
 	this->driftModel(driftF, driftS, axialLoadRatio, shearSpanRatio);
+
 
     if (err != 0) {
         opserr << "Macroelement3d::update() - failed setTrialSectionDeformations()\n";
@@ -2114,7 +2118,7 @@ Macroelement3d::getTangentStiff()
 
   const Vector &s0  = theSections[0]->getStressResultant();
   const Matrix &ks0 = theSections[0]->getSectionTangent();
- 
+
   // i index: line;  j index: column
   for (int i=0; i<4; i++) {
 	  if (ordering[i] >= 0) {
@@ -2870,12 +2874,12 @@ Macroelement3d::getResistingForce()
 	  }
   }
 
-  for (int i=0; i<order; i++) {
+  for (int i = 0; i<4; i++) {
 	  if (ordering[i] >= 0) {
-		  q(i) = s0(ordering[i]);
+     	  q(i) = s0(ordering[i]);
 	  }
   }
-  
+
   // second interface
   order = theSections[1]->getOrder();
   const ID &code1 = theSections[1]->getType();
@@ -2922,7 +2926,6 @@ Macroelement3d::getResistingForce()
 		  q(7 + i) = s2(ordering[i]);
 	  }
   }
-
 
   // shear interface 1 and 2
   for (int sect=0; sect<2; sect++) {
