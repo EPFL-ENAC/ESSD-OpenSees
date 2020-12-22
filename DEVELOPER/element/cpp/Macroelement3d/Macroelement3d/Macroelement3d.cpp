@@ -117,7 +117,6 @@ OPS_Macroelement3d()
 	double failureFactorS = 0.001;
 	double betaShearSpanF = 0.0;
 	double betaShearSpanS = 0.0;
-
 	
 	
     if (numMyMacroelement  == 0) {
@@ -916,6 +915,7 @@ OPS_Macroelement3d()
 	double massGlobal[3];
     int cmass = 0;
     int PDelta = 0;
+	int dampingModel = 0;
 	Vector massDir(3);
 	// default: mass applied along all global directions
 	massDir(0) = massDir(1) = massDir(2) = 1.;
@@ -1018,6 +1018,16 @@ OPS_Macroelement3d()
              PDelta = 1;
 			 alreadReadType = false;
 	       }
+
+	else if (strcmp(type, "-secantDamping") == 0 || strcmp(type, "-SecantDamping") == 0) {
+		dampingModel = 1;
+		alreadReadType = false;
+	}
+
+	else if (strcmp(type, "-secantDampingCycle") == 0 || strcmp(type, "-SecantDampingCycle") == 0) {
+		dampingModel = 2;
+		alreadReadType = false;
+	}
 	       
 	else  if (strcmp(type,"-intWeights") == 0) {
               if(OPS_GetNumRemainingInputArgs() > 2) {
@@ -1198,7 +1208,7 @@ OPS_Macroelement3d()
 
 	 Element *theEle =  new Macroelement3d(iData[0],iData[1],iData[2],iData[3],theSectionI,theSectionE,theSectionJ,theShearModel,theShearModelOOP,h,E_,
 		                                    driftModelF,driftModelF_ALR, driftModelS, driftModelS_ALR, Ltfc, alphaAC_HC, betaShearSpanF, betaShearSpanS, failureFactorF, failureFactorS,
-											axis,oop, intLength, intLengthMasses, massDir, PDelta,mass,cmass, gable);
+											axis,oop, intLength, intLengthMasses, massDir, PDelta,mass,cmass, gable, dampingModel);
 
 	 if ((strcmp(inputStructure,"-tremuri")==0) || 
 		 (strcmp(inputStructure,"-tremuriIP")==0)  || 
@@ -1224,7 +1234,7 @@ Macroelement3d::Macroelement3d(
     double Ltfc, double alphaAC_HC, double betaShearSpanF,
     double betaShearSpanS, double failureFactorF, double failureFactorS,
     Vector axis, Vector oop, Vector _intLength, Vector _intLengthMasses,
-    Vector massDir, int PDelta, double rho, int cm, double _isGable)
+    Vector massDir, int PDelta, double rho, int cm, double _isGable, int dampingModel)
     : Element(tag, 0), numSections(3), numShearModels(2), theSections(0),
       theShearModel(0), connectedExternalNodes(3), GammaC(12, 18), Tgl(18, 18),
       Tgl6(6, 6), Q(18), q(12), uBasic(12), uBasicCommitted(12), rho(rho),
@@ -1240,7 +1250,8 @@ Macroelement3d::Macroelement3d(
       failedFcommitted(false), failedScommitted(false), collapsedF(false),
       collapsedS(false), collapsedFcommitted(false), collapsedScommitted(false),
       failureFactorF(failureFactorF), failureFactorS(failureFactorS),
-      isGable(_isGable), wx(0.0), wy(0.0), wz(0.0) {
+      isGable(_isGable), wx(0.0), wy(0.0), wz(0.0), ductilityDemand(0.0), ductilityDemandCommitted(1.0), 
+	  ductilityDemandPeak(1.0), ductilityDemandCycle(1.), triggerDuctility(true), dampingModel(dampingModel) {
 
   // Allocate arrays of pointers to SectionForceDeformations
   theSections = new SectionForceDeformation *[numSections];
@@ -1253,6 +1264,9 @@ Macroelement3d::Macroelement3d(
   theSections[1] = sE->getCopy();       if (theSections[1] == 0) { opserr << "Macroelement3d::Macroelement3d -- failed to get a copy of section model\n";  exit(-1);  }
   theSections[2] = sJ->getCopy();       if (theSections[2] == 0) { opserr << "Macroelement3d::Macroelement3d -- failed to get a copy of section model\n";  exit(-1);  }
 
+  CommittedDeformation[0] = (theSections[0]->getSectionDeformation());
+  CommittedDeformation[1] = (theSections[1]->getSectionDeformation());
+  CommittedDeformation[2] = (theSections[2]->getSectionDeformation());
 
   theShearModel = new NDMaterial *[numShearModels];
   theShearModel[0] = shearModel->getCopy("BeamFiber");
@@ -1364,7 +1378,8 @@ Macroelement3d::Macroelement3d()
       collapsedS(false), collapsedFcommitted(false), collapsedScommitted(false),
       nodeIInitialDisp(0), nodeJInitialDisp(0), nodeIOffset(0), nodeJOffset(0),
       xAxis(3), yAxis(3), zAxis(3), L(0.0), PDelta(0), deltaW1(0.), deltaV1(0.),
-      deltaW3(0.), deltaV3(0.) {
+      deltaW3(0.), deltaV3(0.), ductilityDemand(0.0), ductilityDemandCommitted(1.0), 
+	  ductilityDemandPeak(1.0), ductilityDemandCycle(1.0), triggerDuctility(true), dampingModel(0) {
   for (int i=0; i<12; i++) {
 	  q0[i] = 0.0;
       p0[i] = 0.0;
@@ -1573,8 +1588,10 @@ Macroelement3d::commitState() {
     }    
 
     // Loop over the interfaces and commit the material states
-    for (int i = 0; i < numSections; i++)
+	for (int i = 0; i < numSections; i++) {
 		retVal += theSections[i]->commitState();
+		CommittedDeformation[i] = (theSections[i]->getSectionDeformation());
+	}
 
     // commit shear model
 	for (int i = 0; i < numShearModels; i++)
@@ -1589,6 +1606,24 @@ Macroelement3d::commitState() {
 
 	// commit basic displacements
 	uBasicCommitted = uBasic;
+
+	ductilityDemandCommitted = ductilityDemand;
+
+	// cycle trigger
+	if (ductilityDemandPeak < ductilityDemandCommitted && triggerDuctility)  ductilityDemandPeak = ductilityDemandCommitted;
+	if (ductilityDemandPeak > ductilityDemandCommitted && !triggerDuctility)  ductilityDemandPeak = ductilityDemandCommitted;
+	if (ductilityDemandCycle < ductilityDemandPeak) ductilityDemandCycle = ductilityDemandPeak;
+	if (ductilityDemandCommitted < 0.95*ductilityDemandPeak && triggerDuctility) {
+		triggerDuctility = false;
+		ductilityDemandPeak = ductilityDemandCommitted;
+		ductilityDemandCycle = ductilityDemandPeak;
+	}
+	if (ductilityDemandCommitted > 1.05*ductilityDemandPeak && !triggerDuctility) {
+		triggerDuctility = true;
+		ductilityDemandPeak = ductilityDemandCommitted;
+	}
+
+	//opserr << "Macroelement " << this->getTag() << ": ductility demand: " << ductilityDemandCommitted << endln;
 
 	return retVal;
 }
@@ -1658,7 +1693,11 @@ Macroelement3d::update(void)
   
     // Set section deformations
 	// divide by integration length
-    
+  double trialDuctilityDemand = 1.0;
+  ductilityDemand = 1.0;
+  double OOPStiffness = 1.;
+  double secantStiffness = 1.;
+  double tangentStiffness = 1.;
 
 	// get ordering of sectional outputs (standard: P, Mz, My, T; a different ordering though can be implemented for some section models)
 	// assume that different section models with different orderings can be applied to the three sections
@@ -1694,6 +1733,36 @@ Macroelement3d::update(void)
 
 	M1 = (theSections[0]->getStressResultant())(ordering[1]);
 
+	if (dampingModel > 0) {
+		if (abs(e(ordering[2])) > DBL_EPSILON) {
+			OOPStiffness = (theSections[0]->getInitialTangent())(ordering[2], ordering[2]);
+			tangentStiffness = ((theSections[0]->getSectionTangent())*(CommittedDeformation[0] - e))[2] / ((CommittedDeformation[0])[2] - e[2]);
+			secantStiffness = (theSections[0]->getStressResultant())(ordering[2]) / e(ordering[2]);
+
+			if (secantStiffness > OOPStiffness)   secantStiffness = OOPStiffness;
+			if (secantStiffness < tangentStiffness)  secantStiffness = tangentStiffness;
+			trialDuctilityDemand = OOPStiffness / secantStiffness;
+			if (ductilityDemand < trialDuctilityDemand) {
+				ductilityDemand = trialDuctilityDemand;
+			}
+		}
+
+		if (abs(e(ordering[1])) > DBL_EPSILON) {
+			OOPStiffness = (theSections[0]->getInitialTangent())(ordering[1], ordering[1]);
+			tangentStiffness = ((theSections[0]->getSectionTangent())*(CommittedDeformation[0] - e))[1] / ((CommittedDeformation[0])[1] - e[1]);
+			secantStiffness = (theSections[0]->getStressResultant())(ordering[1]) / e(ordering[1]);
+
+			if (secantStiffness > OOPStiffness)   secantStiffness = OOPStiffness;
+			if (secantStiffness < tangentStiffness)  secantStiffness = tangentStiffness;
+			trialDuctilityDemand = OOPStiffness / secantStiffness;
+			if (ductilityDemand < trialDuctilityDemand) {
+				ductilityDemand = trialDuctilityDemand;
+			}
+		}
+	}
+	
+	//opserr << "; ductility: " << trialDuctilityDemand << endln;
+
 
 	// second section
 	order = theSections[1]->getOrder();
@@ -1718,6 +1787,32 @@ Macroelement3d::update(void)
 			e( ordering[i] ) = uBasic(i+4)   / intLength(1);
     err += theSections[1]->setTrialSectionDeformation(e);
 
+	OOPStiffness = (theSections[1]->getInitialTangent())(ordering[2], ordering[2]);
+	
+	if (dampingModel > 0) {
+		if (abs(e(ordering[2])) > DBL_EPSILON) {
+			tangentStiffness = ((theSections[1]->getSectionTangent())*(CommittedDeformation[1] - e))[2] / ((CommittedDeformation[1])[2] - e[2]);
+			secantStiffness = (theSections[1]->getStressResultant())(ordering[2]) / e(ordering[2]);
+			if (secantStiffness > OOPStiffness)   secantStiffness = OOPStiffness;
+			if (secantStiffness < tangentStiffness)  secantStiffness = tangentStiffness;
+			trialDuctilityDemand = OOPStiffness / secantStiffness;
+			if (ductilityDemand < trialDuctilityDemand) {
+				ductilityDemand = trialDuctilityDemand;
+			}
+		}
+
+		if (abs(e(ordering[1])) > DBL_EPSILON) {
+			tangentStiffness = ((theSections[1]->getSectionTangent())*(CommittedDeformation[1] - e))[1] / ((CommittedDeformation[1])[1] - e[1]);
+			secantStiffness = (theSections[1]->getStressResultant())(ordering[1]) / e(ordering[1]);
+			if (secantStiffness > OOPStiffness)   secantStiffness = OOPStiffness;
+			if (secantStiffness < tangentStiffness)  secantStiffness = tangentStiffness;
+			trialDuctilityDemand = OOPStiffness / secantStiffness;
+			if (ductilityDemand < trialDuctilityDemand) {
+				ductilityDemand = trialDuctilityDemand;
+			}
+		}
+	}
+
 	//third section
 	order = theSections[2]->getOrder();
 	const ID &code2 = theSections[2]->getType();
@@ -1741,7 +1836,32 @@ Macroelement3d::update(void)
 			e( ordering[i] ) = uBasic(i+7)   / intLength(2);
     err += theSections[2]->setTrialSectionDeformation(e);
 	M3 = (theSections[2]->getStressResultant())(ordering[1]);
-   
+
+	OOPStiffness = (theSections[2]->getInitialTangent())(ordering[2], ordering[2]);
+	
+	if (dampingModel > 0) {
+		if (abs(e(ordering[2])) > DBL_EPSILON) {
+			tangentStiffness = ((theSections[2]->getSectionTangent())*(CommittedDeformation[2] - e))[2] / ((CommittedDeformation[2])[2] - e[2]);
+			secantStiffness = (theSections[2]->getStressResultant())(ordering[2]) / e(ordering[2]);
+			if (secantStiffness > OOPStiffness)   secantStiffness = OOPStiffness;
+			if (secantStiffness < tangentStiffness)  secantStiffness = tangentStiffness;
+			trialDuctilityDemand = OOPStiffness / secantStiffness;
+			if (ductilityDemand < trialDuctilityDemand) {
+				ductilityDemand = trialDuctilityDemand;
+			}
+		}
+
+		if (abs(e(ordering[1])) > DBL_EPSILON) {
+			tangentStiffness = ((theSections[2]->getSectionTangent())*(CommittedDeformation[2] - e))[1] / ((CommittedDeformation[2])[1] - e[2]);
+			secantStiffness = (theSections[2]->getStressResultant())(ordering[1]) / e(ordering[1]);
+			if (secantStiffness > OOPStiffness)   secantStiffness = OOPStiffness;
+			if (secantStiffness < tangentStiffness)  secantStiffness = tangentStiffness;
+			trialDuctilityDemand = OOPStiffness / secantStiffness;
+			if (ductilityDemand < trialDuctilityDemand) {
+				ductilityDemand = trialDuctilityDemand;
+			}
+		}
+	}
 	Vector N(4);
 	N = theSections[1]->getStressResultant();
 
@@ -3540,7 +3660,22 @@ Macroelement3d::getDamp(void)
 	if (betaK != 0.0)
 		theMatrix->addMatrix(1.0, this->getTangentStiff(), betaK);
 	if (betaK0 != 0.0)
-		theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0);
+		if (dampingModel == 0) {
+			theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0);
+		}
+		else {
+			if (ductilityDemandCommitted < 1) {
+				theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0);
+			}
+			else {
+				if (dampingModel == 1) {
+					theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0 / ductilityDemandCommitted);
+				}
+				else {
+					theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0 / ductilityDemandCycle);
+				}
+			}
+		}
 	if (betaKc != 0.0)
 		theMatrix->addMatrix(1.0, this->getSecantStiff(), betaKc);
 
@@ -3584,7 +3719,22 @@ Macroelement3d::getRayleighDampingForces(void)
 	if (betaK != 0.0)
 		theMatrix->addMatrix(1.0, this->getTangentStiff(), betaK);
 	if (betaK0 != 0.0)
-		theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0);
+		if (dampingModel == 0) {
+			theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0);
+		}
+		else {
+			if (ductilityDemandCommitted < 1.0) {
+				theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0);
+			}
+			else {
+				if (dampingModel == 1) {
+					theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0 / ductilityDemandCommitted);
+				}
+				else {
+					theMatrix->addMatrix(1.0, this->getInitialStiff(), betaK0 / ductilityDemandCycle);
+				}
+			}
+		}
 	if (betaKc != 0.0)
 		theMatrix->addMatrix(1.0, this->getSecantStiff(), betaKc);
 

@@ -55,7 +55,7 @@ class Macroelement3d : public Element
 		double h, double E_, 
 		Vector driftF, Vector driftF_ALR, Vector driftS, Vector driftS_ALR, double Ltfc, double alphaAC_HC, double betaShearSpanF, double betaShearSpanS, double failureFactorF, double failureFactorS,
 		Vector axis, Vector oop, Vector intLength, Vector intLengthMasses, Vector massDir, 
-		int PDelta=0, double rho=0.0, int cm=0.0, double isGable=false);
+		int PDelta=0, double rho=0.0, int cm=0.0, double isGable=false, int dampingModel=0);
     Macroelement3d();
     ~Macroelement3d();
 
@@ -178,6 +178,11 @@ class Macroelement3d : public Element
 	
 	bool isGable;                                // flag: gable element (used for mass matrix) 
 	double wx, wy, wz;                           // applied distributed element loads
+
+	double ductilityDemand, ductilityDemandCommitted, ductilityDemandPeak, ductilityDemandCycle; // ductility demands for secant stiffness - damping model
+	bool triggerDuctility;
+	Vector CommittedDeformation[3];    // committed section deformations
+	int dampingModel;
                
 
 };
