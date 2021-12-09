@@ -211,6 +211,9 @@ void* OPS_CatenaryCableElement();
 void* OPS_GradientInelasticBeamColumn2d();
 void* OPS_GradientInelasticBeamColumn3d();
 
+// added by FV
+extern "C" void* OPS_Macroelement3d();
+
 namespace {
 
     struct char_cmp {
@@ -617,6 +620,9 @@ namespace {
 	functionMap.insert(std::make_pair("FourNodeTetrahedron", &OPS_FourNodeTetrahedron));
 	functionMap.insert(std::make_pair("CatenaryCable", &OPS_CatenaryCableElement));
 	functionMap.insert(std::make_pair("gradientInelasticBeamColumn", &OPS_GradientInelasticBeamColumn));
+
+	// added by FV
+	functionMap.insert(std::make_pair("Macroelement3d", &OPS_Macroelement3d));
 
 	return 0;
     }
