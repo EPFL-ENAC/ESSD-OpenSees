@@ -333,7 +333,7 @@ GenericDamagePlasticityShear::evolveDamage(const Vector& s) {
 	double sDrop = dropDrift;      
 
 	double zeta = 0.20;               // capacity drop percentage
-	double slope = zeta *VMax/ (std::max(sDrop, 1.001*sMax) - sMax);
+	double slope = zeta *VMax/ (std::max(sDrop, 1.05*sMax) - sMax);
 
 	if (abs(s(1))<s0) {
 		x = 0.0;

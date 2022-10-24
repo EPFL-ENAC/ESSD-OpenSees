@@ -137,7 +137,7 @@ CohesiveSurface::evolveDamage(const Vector& s) {
 	double sDrop = dropDrift;         // constant drift model
 
 	double zeta = 0.20;               // capacity drop percentage
-	double slope = zeta *(c-mu0*n)/ (std::max(sDrop, 1.001*sMax) - sMax);
+	double slope = zeta *(c-mu0*n)/ (std::max(sDrop, 1.05*sMax) - sMax);
 
 	if (abs(s(1))<s0) {
 		x = 0.0;
