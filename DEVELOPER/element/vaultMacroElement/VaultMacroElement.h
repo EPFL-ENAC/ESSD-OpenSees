@@ -22,8 +22,6 @@ public:
 	void setAcc(std::vector<std::vector<double>> acc);
 	// Perform optimization
 	void compute();
-	// Load output in ::result
-	void loadResult();
 	// Get output for usage outside of the element
 	std::vector<std::vector<double>> getResult();
 
@@ -36,6 +34,9 @@ private:
 	double dt;
 	double theta;
 	std::vector<std::vector<double>> result;
+
+	// Load output in ::result
+	void loadResult();
 
 
 	// Mandatory methods for Element ------------------------------------------
