@@ -10,7 +10,7 @@ set(SRC_FILES VaultMacroElement_2D.cpp VaultMacroElement_2D.h)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
 # Headers and sources
-set(OPENSEES_INDLUDE_DIRS ../../core)
+set(OPENSEES_INCLUDE_DIRS ../../core)
 file(GLOB OPENSEES_SOURCES ../../core/*.cpp)
 
 # Find Python
@@ -24,6 +24,6 @@ include_directories(${Python_INCLUDE_DIRS})
 add_library(VaultMacroElement_2D SHARED ${SRC_FILES})
 
 # Set the include directories
-target_include_directories(VaultMacroElement_2D PRIVATE ${OPENSEES_INDLUDE_DIRS})
+target_include_directories(VaultMacroElement_2D PRIVATE ${OPENSEES_INCLUDE_DIRS})
 target_sources(VaultMacroElement_2D PRIVATE ${OPENSEES_SOURCES})
 target_link_libraries(VaultMacroElement_2D PRIVATE ${Python_LIBRARIES})
