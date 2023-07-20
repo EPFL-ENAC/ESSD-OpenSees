@@ -1,3 +1,5 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -55,8 +57,8 @@ static int numMyMacroelement = 0;
 
 // ------This from VaultMacroElement: -----------------------------------
 // const std::string VaultMacroElement_2d::acc_file_name = "acc.csv"; //TODO: promeni u accel koji dolaze iz ME?
-const std::string VaultMacroElement_2d::result_file_name = "result.csv";
-const std::string VaultMacroElement_2d::python_script_name = "VaultMacroElement.py";
+// const std::string VaultMacroElement_2d::result_file_name = "result.csv";
+// const std::string VaultMacroElement_2d::python_script_name = "VaultMacroElement.py";
 
 
 // Export acc into a csv
@@ -79,6 +81,34 @@ const std::string VaultMacroElement_2d::python_script_name = "VaultMacroElement.
 //}
 //--------------------------------------------------------------------------
 
+// Some Python helper functions
+
+int getPythonFunction(PyObject* pModule, const char* functionName, PyObject** pFunction) {
+	*pFunction = PyObject_GetAttrString(pModule, functionName);
+
+	if (!pFunction || !PyCallable_Check(pFunction)) {
+		PyErr_Print();
+		Py_Finalize();
+		return 1;
+	}
+
+	return 0;
+}
+
+void convertVectorToPyList(const Vector& v, PyObject** pList) {
+	*pList = PyList_New(v.Size());
+
+	for (int i = 0; i < v.Size(); i++) {
+		PyList_SetItem(*pList, i, PyFloat_FromDouble(v[i]));
+	}
+}
+
+void convertPyListToVector(PyObject* pList, Vector& v) {
+	v.resize(PyList_Size(pList));
+	for (int i = 0; i < v.Size(); i++) {
+		v[i] = PyFloat_AsDouble(PyList_GetItem(pList, i));
+	}
+}
 
 OPS_Export void *
 OPS_VaultMacroElement_2d()
@@ -179,9 +209,12 @@ OPS_VaultMacroElement_2d()
     Element *theEle =  new VaultMacroElement_2d(iData[0],iData[1],iData[2],secTags.Size(),sections,
 					    *bi,*theTransf, dt, theta, mass, cmass, dampingModel);
     delete [] sections;
+
+
+
+
+
     return theEle;
-
-
 }
 
 
@@ -246,7 +279,7 @@ VaultMacroElement_2d::VaultMacroElement_2d(int tag, int nd1, int nd2,
   p0[1] = 0.0;
   p0[2] = 0.0;
    
-    
+  initializePython();
 }
 
 VaultMacroElement_2d::VaultMacroElement_2d()
@@ -265,9 +298,34 @@ VaultMacroElement_2d::VaultMacroElement_2d()
 
     theNodes[0] = 0;
     theNodes[1] = 0;
+
+
+    initializePython();
 }
 
 
+int VaultMacroElement_2d::initializePython() {
+	// Setup Python process
+	Py_Initialize();
+
+	// Add current working directory to path
+	PyRun_SimpleString("import sys");
+	PyRun_SimpleString("sys.path.append(\".\")");
+
+	// Import Python module
+	std::cout << "Importing module" << std::endl;
+	pModule = PyImport_ImportModule("VaultMacroElement");
+	if (!pModule) {
+		PyErr_Print();
+		Py_Finalize();
+		return 1;
+	}
+
+	// Get references to Python functions
+	if (getPythonFunction(pModule, "update", &pUpdateFunc) != 0) return 1;
+	if (getPythonFunction(pModule, "get_resisting_force", &pGetResistingForceFunc) != 0) return 1;
+	if (getPythonFunction(pModule, "get_initial_stiff", &pGetInitialStiffFunc) != 0) return 1;
+}
 
 
 VaultMacroElement_2d::~VaultMacroElement_2d()
@@ -286,6 +344,8 @@ VaultMacroElement_2d::~VaultMacroElement_2d()
 
   if (beamInt != 0)
     delete beamInt;
+
+  Py_Finalize();
 }
 
 
@@ -389,11 +449,30 @@ VaultMacroElement_2d::update(void)
   crdTransf->update();
   
   /// Get basic deformations
-  const Vector &v = crdTransf->getBasicTrialDisp();
-  const Vector &v = crdTransf->getBasicTrialAccel();
+  const Vector &disp = crdTransf->getBasicTrialDisp();
+  const Vector &accel = crdTransf->getBasicTrialAccel();
   
 
-   //FIXME: IT4R: Pass to my python getBasicTrialAcc/Displ 
+  //FIXME: IT4R: Pass to my python getBasicTrialAcc/Displ 
+
+	// Create arguments for python function
+	PyObject *pDisp;
+	PyObject *pAccel;
+	convertVectorToPyList(disp, &pDisp);
+	convertVectorToPyList(accel, &pAccel);
+	PyObject* pArgs = PyTuple_Pack(2, pDisp, pAccel);
+	if (!pArgs) {
+		PyErr_Print();
+		err = 1;
+	}
+
+	// Call python function
+	PyObject_CallObject(pUpdateFunc, pArgs);
+
+	// Clean up
+	Py_DECREF(pArgs);
+	Py_DECREF(pDisp);
+	Py_DECREF(pAccel);
 
 
 
@@ -706,6 +785,20 @@ VaultMacroElement_2d::getInitialStiff()
 {
   //const Matrix &kb = this->getInitialBasicStiff();
   //FIXME: IT4R: input of a matrix from python. 
+
+	// Call Python function
+	PyObject* pResult = PyObject_CallObject(pGetInitialStiffFunc, NULL);
+	if (!pResult) {
+		PyErr_Print();
+	}
+
+	// Convert Python object to flat Vector
+	Vector kbFlat;
+	convertPyListToVector(pResult, kbFlat);
+	
+
+
+
   // Transform to global stiffness
   K = crdTransf->getInitialGlobalStiffMatrix(kb);
 
@@ -793,6 +886,18 @@ VaultMacroElement_2d::getResistingForce()
 {
 
   //FIXME: IT4R: Here return reactions from python.
+
+	// Call Python function
+	PyObject* pResult = PyObject_CallMethod(pModule, "getResistingForce", NULL);
+	if (!pResult) {
+		PyErr_Print();
+	}
+
+	// Convert Python object to Vector
+	Vector resistingForce;
+	convertPyListToVector(pResult, resistingForce);
+	
+
   /* double L = crdTransf->getInitialLength();
   
   double oneOverL = 1.0/L;

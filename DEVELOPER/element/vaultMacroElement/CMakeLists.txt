@@ -13,9 +13,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)
 set(OPENSEES_INDLUDE_DIRS ../../core)
 file(GLOB OPENSEES_SOURCES ../../core/*.cpp)
 
+# Find Python
+find_package(Python COMPONENTS Interpreter Development)
+if(NOT Python_FOUND)
+	message(FATAL_ERROR "Python not found")
+endif()
+include_directories(${Python_INCLUDE_DIRS})
+
 # Set the target to be a shared library
 add_library(VaultMacroElement_2D SHARED ${SRC_FILES})
 
 # Set the include directories
 target_include_directories(VaultMacroElement_2D PRIVATE ${OPENSEES_INDLUDE_DIRS})
 target_sources(VaultMacroElement_2D PRIVATE ${OPENSEES_SOURCES})
+target_link_libraries(VaultMacroElement_2D PRIVATE ${Python_LIBRARIES})

@@ -1,37 +1,27 @@
-import csv
-import sys
-
 import numpy as np
 
 from Kinematics import *
 
-
-acc_file_name = "acc.csv"
-result_file_name = "result.csv"
+state = np.array([0])
 
 
-def read_csv(file_name):
-    with open(file_name, "r") as f:
-        reader = csv.reader(f)
-        data = list(reader)
-    return data
+def update(disp, accel):
+    global state
+
+    disp = np.array(disp)
+    accel = np.array(accel)
+
+    model = Model_TH() # Test Kinematics import
+
+    state[0] += 1
+    print("state: ", state[0]) # Test state update
 
 
-def write_csv(data, file_name):
-    with open(file_name, "w", newline="") as f:
-        writer = csv.writer(f)
-        for row in data:
-            writer.writerow(row)
+def get_resisting_force():
+    force = np.array([1, 2, 3])
+    return force.tolist() # WARNING: must return a list for C++
 
 
-dt = sys.argv[1]
-theta = sys.argv[2]
-acc = read_csv(acc_file_name)
-model = Model_TH()
-
-
-# Do something
-
-
-result = [[1, 2], [3, 4], [5, 6]]
-write_csv(result, result_file_name)
+def get_initial_stiff():
+    stiff = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    return stiff.flatten().tolist() # flatten() returns a 1D array, easier to process in C++

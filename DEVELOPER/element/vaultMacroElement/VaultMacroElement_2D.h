@@ -1,6 +1,8 @@
 #ifndef VaultMacroelement2d_h // Proveri da li treba da bude istog naziva kao i file? Ne treba, tu definises macro. 
 #define VaultMacroelement2d_h
 
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include <Element.h>
 #include <Matrix.h>
 #include <Vector.h>
@@ -118,16 +120,23 @@ class VaultMacroElement_2d : public Element
 
 
     //--------This from VaultMacroELement: --------------
-    static const std::string acc_file_name;
-    static const std::string result_file_name;
-    static const std::string python_script_name;
+    // static const std::string acc_file_name;
+    // static const std::string result_file_name;
+    // static const std::string python_script_name;
 
-    std::vector<std::vector<double>> result;
+    // std::vector<std::vector<double>> result;
 
     // Load output in ::result
     void loadResult();
     //---------------------------------------------------    
+	
 
+	// Link with Python
+	int initializePython();
+	PyObject* pModule;
+	PyObject* pUpdateFunc;
+	PyObject* pGetResistingForceFunc;
+	PyObject* pGetInitialStiffFunc;
 
 };
 
